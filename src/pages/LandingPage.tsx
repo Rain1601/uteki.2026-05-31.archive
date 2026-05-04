@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, ChevronDown, LineChart, Newspaper, Bot, Building2, Activity,
-  Layers, Vote, Mail, Github, Globe,
+  ArrowUpRight, ChevronDown, Layers, Vote, Activity,
+  Github, Globe, Brain, GitBranch, Award,
 } from 'lucide-react';
 import { useT, useI18n } from '../i18n/I18nProvider';
 import { STRINGS } from '../i18n/strings';
 import LangToggle from '../components/LangToggle';
-import { BACKGROUND_PAPER, COLOR_BG, COLOR_INK, fmtPct, fmtUsd } from '../theme/editorialTokens';
+import { BACKGROUND_PAPER, COLOR_BG, COLOR_INK } from '../theme/editorialTokens';
 import MultiAgentDiagram from '../components/landing/MultiAgentDiagram';
 import ModelLogos from '../components/landing/ModelLogos';
-import { getLeaderboard, getOverview, type EvalOverview, type LeaderboardEntry } from '../mocks/dashboard';
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import GatewayPanel from '../components/landing/GatewayPanel';
+import HoldingsPanel from '../components/landing/HoldingsPanel';
+import DemoPreview from '../components/landing/DemoPreview';
+import CopyableEmail from '../components/landing/CopyableEmail';
 
 const SECTIONS = [
   { id: 'hero',         labelZh: '首页', labelEn: 'Top' },
@@ -23,20 +25,11 @@ const SECTIONS = [
   { id: 'contact',      labelZh: '联系', labelEn: 'Contact' },
 ];
 
-const FEATURES = [
-  { to: '/dashboard',                icon: LineChart,  key: 'dashboard' as const },
-  { to: '/macro/market-dashboard',   icon: Activity,   key: 'market'    as const },
-  { to: '/news-timeline',            icon: Newspaper,  key: 'news'      as const },
-  { to: '/agent',                    icon: Bot,        key: 'agent'     as const },
-  { to: '/company-agent',            icon: Building2,  key: 'company'   as const },
-];
-
 export default function LandingPage() {
   const t = useT();
   const shellRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  // Track which section is in view via IntersectionObserver
   useEffect(() => {
     const shell = shellRef.current;
     if (!shell) return;
@@ -64,8 +57,7 @@ export default function LandingPage() {
   function scrollTo(id: string) {
     const shell = shellRef.current;
     if (!shell) return;
-    const sec = shell.querySelector<HTMLElement>(`section[data-snap-id="${id}"]`);
-    sec?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    shell.querySelector<HTMLElement>(`section[data-snap-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   return (
@@ -73,7 +65,7 @@ export default function LandingPage() {
       style={{ backgroundColor: COLOR_BG, color: COLOR_INK, backgroundImage: BACKGROUND_PAPER }}
       className="relative h-screen overflow-hidden"
     >
-      {/* Sticky top bar (overlay) */}
+      {/* Sticky top bar */}
       <header className="absolute top-0 left-0 right-0 px-8 md:px-14 pt-6 pb-3 flex items-center justify-between z-50 bg-[#15130F]/55 backdrop-blur-md border-b border-ink-faint/15">
         <button
           onClick={() => scrollTo('hero')}
@@ -97,7 +89,7 @@ export default function LandingPage() {
         <LangToggle />
       </header>
 
-      {/* Side dot indicator */}
+      {/* Right dot indicator */}
       <aside className="absolute right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
         {SECTIONS.map((s, i) => (
           <button
@@ -120,7 +112,6 @@ export default function LandingPage() {
         ))}
       </aside>
 
-      {/* Snap scroll shell */}
       <div ref={shellRef} className="snap-shell">
         <HeroSection onNext={() => scrollTo('about')} />
         <AboutSection />
@@ -164,8 +155,6 @@ function HeroSection({ onNext }: { onNext: () => void }) {
           <ChevronDown size={16} strokeWidth={1.5} />
         </button>
       </div>
-
-      {/* Pulse scroll cue */}
       <button
         onClick={onNext}
         aria-label="scroll to next"
@@ -188,7 +177,7 @@ function AboutSection() {
   return (
     <section data-snap-id="about" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-20">
       <SectionEyebrow num="01" label={STRINGS.about.eyebrow} />
-      <h2 className="font-display italic-display text-[36px] md:text-[52px] leading-[1.1] text-ink max-w-4xl mb-6 mt-3">
+      <h2 className="font-display italic-display text-[40px] md:text-[60px] leading-[1.08] text-ink max-w-4xl mb-6 mt-3">
         {t(STRINGS.about.title)}
       </h2>
       <p className="font-body text-[16px] md:text-[18px] leading-relaxed text-ink-muted max-w-3xl mb-12">
@@ -211,9 +200,9 @@ function AboutSection() {
 function ArchitectureSection() {
   const t = useT();
   return (
-    <section data-snap-id="architecture" className="flex flex-col justify-center px-8 md:px-14 max-w-7xl mx-auto py-20">
+    <section data-snap-id="architecture" className="flex flex-col justify-center px-8 md:px-14 max-w-7xl mx-auto py-16">
       <SectionEyebrow num="02" label={STRINGS.arch.eyebrow} />
-      <div className="flex items-end justify-between gap-4 flex-wrap mb-8 mt-3">
+      <div className="flex items-end justify-between gap-4 flex-wrap mb-6 mt-3">
         <h2 className="font-display italic-display text-[36px] md:text-[48px] leading-[1.1] text-ink">
           {t(STRINGS.arch.title)}
         </h2>
@@ -221,57 +210,49 @@ function ArchitectureSection() {
           {t(STRINGS.arch.sub)}
         </p>
       </div>
-      <div className="rounded border border-ink-faint/30 bg-[#1a1612]/40 p-3 md:p-6">
+
+      {/* Diagram */}
+      <div className="rounded border border-ink-faint/30 bg-[#1a1612]/40 p-3 md:p-5 mb-6">
         <MultiAgentDiagram />
       </div>
+
+      {/* Three explanatory cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ArchCard icon={Brain}    color="#C9A97E" title={t(STRINGS.arch.companyDeepTitle)} desc={t(STRINGS.arch.companyDeepDesc)} highlight />
+        <ArchCard icon={GitBranch} color="#A8896E" title={t(STRINGS.arch.overallTitle)}     desc={t(STRINGS.arch.overallDesc)} />
+        <ArchCard icon={Award}    color="#6FAF8D" title={t(STRINGS.arch.evalTitle)}        desc={t(STRINGS.arch.evalDesc)} />
+      </div>
     </section>
+  );
+}
+
+function ArchCard({
+  icon: Icon, color, title, desc, highlight,
+}: {
+  icon: typeof Brain; color: string; title: string; desc: string; highlight?: boolean;
+}) {
+  return (
+    <div className={`rounded border ${highlight ? 'border-accent/60 bg-[#1f1812]' : 'border-ink-faint/30 bg-[#1a1612]/60'} p-5 flex flex-col`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon size={18} strokeWidth={1.4} style={{ color }} />
+        <h3 className="font-display italic-display text-[17px] text-ink">{title}</h3>
+      </div>
+      <p className="font-body text-[12.5px] text-ink-muted leading-relaxed">{desc}</p>
+    </div>
   );
 }
 
 // ── Section 4: Performance ──────────────────────────────────────────────────
 function PerformanceSection() {
   const t = useT();
-  const [overview, setOverview] = useState<EvalOverview | null>(null);
-  const [board, setBoard] = useState<LeaderboardEntry[]>([]);
-  useEffect(() => {
-    Promise.all([getOverview(), getLeaderboard()]).then(([o, b]) => { setOverview(o); setBoard(b); });
-  }, []);
-  const chartData = board.map((m) => ({
-    name: m.model_name.replace('claude-', '').replace('gpt-', '').replace('gemini-', '').replace('-', ' '),
-    winRate: parseFloat((m.win_rate * 100).toFixed(1)),
-  }));
   return (
     <section data-snap-id="performance" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-20">
       <SectionEyebrow num="03" label={STRINGS.perf.eyebrow} />
       <h2 className="font-display italic-display text-[36px] md:text-[52px] leading-[1.1] text-ink mb-2 mt-3">
         {t(STRINGS.perf.title)}
       </h2>
-      <p className="font-body italic text-[13px] text-ink-faint mb-8">{t(STRINGS.perf.sub)}</p>
-
-      {overview && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
-          <Kpi value={overview.total_arena_runs.toString()} label={t(STRINGS.perf.runs)} />
-          <Kpi value={overview.total_decisions.toLocaleString()} label={t(STRINGS.perf.decisions)} />
-          <Kpi value={fmtPct(overview.avg_win_rate * 100, 1)} label={t(STRINGS.perf.winRate)} positive />
-          <Kpi value="opus 4.7" label={t(STRINGS.perf.bestModel)} />
-          <Kpi value={fmtUsd(overview.total_cost_usd)} label={t(STRINGS.perf.cost)} />
-          <Kpi value={`${(overview.avg_latency_ms / 1000).toFixed(1)}s`} label={t(STRINGS.perf.latency)} />
-        </div>
-      )}
-
-      <div className="rounded border border-ink-faint/30 bg-[#1a1612]/60 p-5">
-        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-accent mb-3">{t(STRINGS.perf.leaderboard)}</div>
-        <div className="h-[240px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-              <XAxis dataKey="name" stroke="#A8A097" tick={{ fontSize: 11, fontFamily: 'JetBrains Mono' }} axisLine={{ stroke: '#5C5750' }} tickLine={false} />
-              <YAxis stroke="#A8A097" tick={{ fontSize: 11, fontFamily: 'JetBrains Mono' }} axisLine={{ stroke: '#5C5750' }} tickLine={false} unit="%" domain={[0, 80]} />
-              <Tooltip contentStyle={{ background: '#1B1814', border: '1px solid #A8896E55', borderRadius: 4, fontFamily: 'JetBrains Mono', fontSize: 11 }} cursor={{ fill: '#23191a' }} />
-              <Bar dataKey="winRate" name="win rate" fill="#6FAF8D" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      <p className="font-body italic text-[13px] text-ink-faint mb-10 max-w-3xl">{t(STRINGS.perf.sub)}</p>
+      <HoldingsPanel />
     </section>
   );
 }
@@ -280,55 +261,44 @@ function PerformanceSection() {
 function ModelsSection() {
   const t = useT();
   return (
-    <section data-snap-id="models" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-20">
+    <section data-snap-id="models" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-16">
       <SectionEyebrow num="04" label={STRINGS.models.eyebrow} />
-      <h2 className="font-display italic-display text-[36px] md:text-[52px] leading-[1.1] text-ink mb-3 mt-3 max-w-3xl">
+      <h2 className="font-display italic-display text-[34px] md:text-[44px] leading-[1.1] text-ink mb-3 mt-3 max-w-3xl">
         {t(STRINGS.models.title)}
       </h2>
-      <p className="font-body text-[16px] text-ink-muted leading-relaxed max-w-3xl mb-12">
+      <p className="font-body text-[15px] text-ink-muted leading-relaxed max-w-3xl mb-6">
         {t(STRINGS.models.sub)}
       </p>
-      <ModelLogos variant="grid" size="lg" />
-      <p className="mt-8 font-body italic text-[12px] text-ink-faint max-w-3xl">
+
+      <GatewayPanel />
+
+      <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-3">
+        {t(STRINGS.models.directTitle)}
+      </div>
+      <ModelLogos variant="grid" size="md" />
+
+      <p className="mt-5 font-body italic text-[11.5px] text-ink-faint max-w-3xl">
         {t(STRINGS.models.arenaNote)}
       </p>
     </section>
   );
 }
 
-// ── Section 6: Demos ────────────────────────────────────────────────────────
+// ── Section 6: Demos (preview iframe + prev/next) ───────────────────────────
 function DemosSection() {
   const t = useT();
   return (
-    <section data-snap-id="demos" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-20">
-      <SectionEyebrow num="05" label={STRINGS.landing.sectionFeatures} />
-      <h2 className="font-display italic-display text-[36px] md:text-[48px] leading-[1.1] text-ink mb-3 mt-3">
-        {t({ zh: '现在就点开看看', en: 'Open one now' })}
-      </h2>
-      <p className="font-body text-[14px] text-ink-muted max-w-2xl leading-relaxed mb-10">
-        {t(STRINGS.landing.sectionFeaturesSub)}
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {FEATURES.map(({ to, icon: Icon, key }) => (
-          <Link
-            key={to}
-            to={to}
-            className="group rounded border border-ink-faint/30 bg-[#1a1612]/60 p-5 hover:border-accent/60 transition-colors flex flex-col min-h-[170px]"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <Icon size={20} strokeWidth={1.4} className="text-ink-muted group-hover:text-ink transition-colors" />
-              <ArrowUpRight size={15} strokeWidth={1.5} className="text-ink-faint group-hover:text-ink transition-colors" />
-            </div>
-            <h3 className="font-display italic-display text-[20px] text-ink mb-2 leading-tight">
-              {t(STRINGS.features[key].title)}
-            </h3>
-            <p className="font-body text-[12.5px] text-ink-muted leading-relaxed mt-auto">
-              {t(STRINGS.features[key].desc)}
-            </p>
-            <div className="mt-3 font-mono text-[10px] tracking-wider text-ink-faint">{to}</div>
-          </Link>
-        ))}
+    <section data-snap-id="demos" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-12">
+      <SectionEyebrow num="05" label={STRINGS.demoPreview.eyebrow} />
+      <div className="flex items-end justify-between gap-4 flex-wrap mb-4 mt-3">
+        <h2 className="font-display italic-display text-[32px] md:text-[42px] leading-[1.1] text-ink">
+          {t(STRINGS.demoPreview.title)}
+        </h2>
+        <p className="font-body text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.demoPreview.sub)}
+        </p>
       </div>
+      <DemoPreview />
     </section>
   );
 }
@@ -336,10 +306,9 @@ function DemosSection() {
 // ── Section 7: Contact + Footer ─────────────────────────────────────────────
 function ContactSection() {
   const t = useT();
-  const contacts = [
-    { icon: Mail,   label: STRINGS.contact.emailLabel,  value: 'rain1104@foxmail.com', href: 'mailto:rain1104@foxmail.com' },
-    { icon: Github, label: STRINGS.contact.githubLabel, value: 'github.com/Rain1601',  href: 'https://github.com/Rain1601' },
-    { icon: Globe,  label: STRINGS.contact.blogLabel,   value: 'raincraft.dev',        href: 'https://raincraft.dev/' },
+  const links = [
+    { icon: Github, label: STRINGS.contact.githubLabel, value: 'github.com/Rain1601', href: 'https://github.com/Rain1601' },
+    { icon: Globe,  label: STRINGS.contact.blogLabel,   value: 'raincraft.dev',       href: 'https://raincraft.dev/' },
   ];
   return (
     <section data-snap-id="contact" className="flex flex-col justify-center px-8 md:px-14 max-w-6xl mx-auto py-20">
@@ -351,12 +320,13 @@ function ContactSection() {
         {t(STRINGS.contact.sub)}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        {contacts.map(({ icon: Icon, label, value, href }) => (
+        <CopyableEmail email="rain1104@foxmail.com" />
+        {links.map(({ icon: Icon, label, value, href }) => (
           <a
             key={value}
             href={href}
-            target={href.startsWith('http') ? '_blank' : undefined}
-            rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group rounded border border-ink-faint/30 bg-[#1a1612]/60 p-5 hover:border-accent/60 hover:bg-[#1f1a16] transition-colors flex items-start gap-4"
           >
             <Icon size={22} strokeWidth={1.4} className="text-ink-muted group-hover:text-ink transition-colors mt-0.5" />
@@ -386,16 +356,4 @@ function SectionEyebrow({ num, label }: { num: string; label: { zh: string; en: 
   );
 }
 
-function Kpi({ value, label, positive }: { value: string; label: string; positive?: boolean }) {
-  return (
-    <div className="border-l-2 border-ink-faint/30 pl-3">
-      <div className={`font-display italic-display text-[28px] leading-none mb-1 ${positive ? 'text-gain' : 'text-ink'}`}>
-        {value}
-      </div>
-      <div className="font-mono text-[10px] uppercase tracking-wider text-ink-faint">{label}</div>
-    </div>
-  );
-}
-
-// silence imports kept for backward compatibility
 void useI18n;
