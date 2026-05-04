@@ -13,15 +13,18 @@ import ModelLogos from '../components/landing/ModelLogos';
 import GatewayPanel from '../components/landing/GatewayPanel';
 import HoldingsPanel from '../components/landing/HoldingsPanel';
 import DemoPreview from '../components/landing/DemoPreview';
+import RealDataSection from '../components/landing/RealDataSection';
 import CopyableEmail from '../components/landing/CopyableEmail';
 
+// Story flow: what is it → what's the result → how does it run → what does it
+// actually produce → what's underneath → how to reach me
 const SECTIONS = [
   { id: 'hero',         labelZh: '首页', labelEn: 'Top' },
   { id: 'about',        labelZh: '介绍', labelEn: 'About' },
+  { id: 'performance',  labelZh: '实盘', labelEn: 'Live' },
+  { id: 'demos',        labelZh: '流程', labelEn: 'Process' },
+  { id: 'real',         labelZh: '真实', labelEn: 'Real' },
   { id: 'architecture', labelZh: '架构', labelEn: 'Architecture' },
-  { id: 'performance',  labelZh: '表现', labelEn: 'Performance' },
-  { id: 'models',       labelZh: '模型', labelEn: 'Models' },
-  { id: 'demos',        labelZh: '演示', labelEn: 'Demos' },
   { id: 'contact',      labelZh: '联系', labelEn: 'Contact' },
 ];
 
@@ -89,7 +92,7 @@ export default function LandingPage() {
         <LangToggle />
       </header>
 
-      {/* Right dot indicator */}
+      {/* Side dot indicator */}
       <aside className="absolute right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
         {SECTIONS.map((s, i) => (
           <button
@@ -115,10 +118,10 @@ export default function LandingPage() {
       <div ref={shellRef} className="snap-shell">
         <HeroSection onNext={() => scrollTo('about')} />
         <AboutSection />
-        <ArchitectureSection />
         <PerformanceSection />
-        <ModelsSection />
         <DemosSection />
+        <RealDataSectionWrapper />
+        <ArchitectureSection />
         <ContactSection />
       </div>
     </div>
@@ -130,15 +133,21 @@ function HeroSection({ onNext }: { onNext: () => void }) {
   const t = useT();
   return (
     <section data-snap-id="hero" className="relative flex flex-col items-start justify-center px-6 md:px-14 max-w-7xl mx-auto">
-      <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.28em] sm:tracking-[0.32em] text-accent mb-5 mt-4 md:mt-16">
-        {t(STRINGS.landing.eyebrow)} · {t({ zh: '数据为模拟', en: 'mocked data' })}
+      {/* Eyebrow brand-line */}
+      <div className="font-mono text-[11px] sm:text-[12px] uppercase tracking-[0.32em] text-accent mb-6 mt-4 md:mt-16 flex items-center gap-3">
+        <span className="text-ink">{t(STRINGS.heroEyebrow)}</span>
+        <span className="h-px w-8 bg-accent/50" />
+        <span>{t({ zh: '产品演示 · 数据为模拟', en: 'Demo site · mocked data' })}</span>
       </div>
-      <h1 className="font-display italic-display text-[34px] sm:text-[44px] md:text-[80px] leading-[1.05] md:leading-[1.02] tracking-[-0.02em] text-ink max-w-5xl">
-        {t(STRINGS.landing.heroTitle)}
+
+      <h1 className="font-display italic-display text-[40px] sm:text-[52px] md:text-[88px] leading-[1.04] md:leading-[1.0] tracking-[-0.02em] text-ink max-w-5xl">
+        {t(STRINGS.heroBigTitle)}
       </h1>
-      <p className="mt-6 md:mt-8 font-body text-[15px] sm:text-[17px] md:text-[21px] leading-relaxed text-ink-muted max-w-2xl">
-        {t(STRINGS.landing.heroSub)}
+
+      <p className="mt-6 md:mt-8 font-body text-[15px] sm:text-[17px] md:text-[20px] leading-relaxed text-ink-muted max-w-2xl">
+        {t(STRINGS.heroSubBody)}
       </p>
+
       <div className="mt-8 md:mt-10 flex flex-wrap gap-3">
         <Link
           to="/dashboard"
@@ -155,6 +164,7 @@ function HeroSection({ onNext }: { onNext: () => void }) {
           <ChevronDown size={16} strokeWidth={1.5} />
         </button>
       </div>
+
       <button
         onClick={onNext}
         aria-label="scroll to next"
@@ -166,7 +176,7 @@ function HeroSection({ onNext }: { onNext: () => void }) {
   );
 }
 
-// ── Section 2: About ────────────────────────────────────────────────────────
+// ── Section 2: About (是什么) ───────────────────────────────────────────────
 function AboutSection() {
   const t = useT();
   const pillars = [
@@ -196,12 +206,74 @@ function AboutSection() {
   );
 }
 
-// ── Section 3: Architecture ─────────────────────────────────────────────────
+// ── Section 3: Performance (取得了什么效果) ────────────────────────────────
+function PerformanceSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="performance" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
+      <div className="flex items-center gap-3 mt-4 md:mt-16 mb-3">
+        <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.24em] sm:tracking-[0.32em] text-accent">
+          § 02 · {t(STRINGS.livePerf.eyebrow)}
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] px-2 py-0.5 rounded bg-gain/15 text-gain border border-gain/40">
+          {t(STRINGS.livePerf.chip)}
+        </span>
+      </div>
+      <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[52px] leading-[1.1] text-ink mb-2">
+        {t(STRINGS.perf.title)}
+      </h2>
+      <p className="font-body italic text-[12px] md:text-[13px] text-ink-faint mb-6 md:mb-10 max-w-3xl">
+        {t(STRINGS.livePerf.chipNote)} · {t(STRINGS.perf.sub)}
+      </p>
+      <HoldingsPanel />
+    </section>
+  );
+}
+
+// ── Section 4: Demos (运行过程) ────────────────────────────────────────────
+function DemosSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="demos" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-10 md:py-12">
+      <SectionEyebrow num="03" label={STRINGS.demoProcess.eyebrow} />
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-4 mt-3">
+        <h2 className="font-display italic-display text-[26px] sm:text-[30px] md:text-[42px] leading-[1.1] text-ink">
+          {t(STRINGS.demoProcess.title)}
+        </h2>
+        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.demoProcess.sub)}
+        </p>
+      </div>
+      <DemoPreview />
+    </section>
+  );
+}
+
+// ── Section 5: Real data (真实运行结果) ────────────────────────────────────
+function RealDataSectionWrapper() {
+  const t = useT();
+  return (
+    <section data-snap-id="real" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-16">
+      <SectionEyebrow num="04" label={STRINGS.real.eyebrow} />
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-5 md:mb-6 mt-3">
+        <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[48px] leading-[1.1] text-ink">
+          {t(STRINGS.real.title)}
+        </h2>
+        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.real.sub)}
+        </p>
+      </div>
+      <RealDataSection />
+    </section>
+  );
+}
+
+// ── Section 6: Architecture (里面是什么) ───────────────────────────────────
 function ArchitectureSection() {
   const t = useT();
   return (
     <section data-snap-id="architecture" className="flex flex-col justify-center px-6 md:px-14 max-w-7xl mx-auto py-12 md:py-16">
-      <SectionEyebrow num="02" label={STRINGS.arch.eyebrow} />
+      <SectionEyebrow num="05" label={STRINGS.arch.eyebrow} />
       <div className="flex items-end justify-between gap-3 flex-wrap mb-5 md:mb-6 mt-3">
         <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[48px] leading-[1.1] text-ink">
           {t(STRINGS.arch.title)}
@@ -211,18 +283,41 @@ function ArchitectureSection() {
         </p>
       </div>
 
-      {/* Diagram — horizontally scroll on small viewports */}
+      {/* Diagram */}
       <div className="rounded border border-ink-faint/30 bg-[#1a1612]/40 p-2 md:p-5 mb-4 md:mb-6 overflow-x-auto">
         <div className="min-w-[680px]">
           <MultiAgentDiagram />
         </div>
       </div>
 
-      {/* Three explanatory cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-        <ArchCard icon={Brain}    color="#C9A97E" title={t(STRINGS.arch.companyDeepTitle)} desc={t(STRINGS.arch.companyDeepDesc)} highlight />
+      {/* Three sub-cards: current arch · deep research · voting (with models folded in) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-6">
         <ArchCard icon={GitBranch} color="#A8896E" title={t(STRINGS.arch.overallTitle)}     desc={t(STRINGS.arch.overallDesc)} />
-        <ArchCard icon={Award}    color="#6FAF8D" title={t(STRINGS.arch.evalTitle)}        desc={t(STRINGS.arch.evalDesc)} />
+        <ArchCard icon={Brain}     color="#C9A97E" title={t(STRINGS.arch.companyDeepTitle)} desc={t(STRINGS.arch.companyDeepDesc)} highlight />
+        <ArchCard icon={Award}     color="#6FAF8D" title={`${t(STRINGS.arch.evalTitle)} · ${t({ zh: '可选', en: 'optional' })}`} desc={t(STRINGS.arch.evalDesc)} />
+      </div>
+
+      {/* Voting capability — folded-in Models content */}
+      <div className="rounded border border-ink-faint/30 bg-[#1a1612]/40 p-4 md:p-6">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Award size={16} strokeWidth={1.4} className="text-gain" />
+            <h3 className="font-display italic-display text-[18px] text-ink">
+              {t(STRINGS.models.title)}
+            </h3>
+          </div>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
+            {t(STRINGS.models.eyebrow)}
+          </span>
+        </div>
+        <GatewayPanel />
+        <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-3">
+          {t(STRINGS.models.directTitle)}
+        </div>
+        <ModelLogos variant="grid" size="sm" />
+        <p className="mt-4 font-body italic text-[11px] md:text-[11.5px] text-ink-faint max-w-3xl">
+          {t(STRINGS.models.arenaNote)}
+        </p>
       </div>
     </section>
   );
@@ -244,68 +339,7 @@ function ArchCard({
   );
 }
 
-// ── Section 4: Performance ──────────────────────────────────────────────────
-function PerformanceSection() {
-  const t = useT();
-  return (
-    <section data-snap-id="performance" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
-      <SectionEyebrow num="03" label={STRINGS.perf.eyebrow} />
-      <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[52px] leading-[1.1] text-ink mb-2 mt-3">
-        {t(STRINGS.perf.title)}
-      </h2>
-      <p className="font-body italic text-[12px] md:text-[13px] text-ink-faint mb-6 md:mb-10 max-w-3xl">{t(STRINGS.perf.sub)}</p>
-      <HoldingsPanel />
-    </section>
-  );
-}
-
-// ── Section 5: Models ───────────────────────────────────────────────────────
-function ModelsSection() {
-  const t = useT();
-  return (
-    <section data-snap-id="models" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-16">
-      <SectionEyebrow num="04" label={STRINGS.models.eyebrow} />
-      <h2 className="font-display italic-display text-[26px] sm:text-[30px] md:text-[44px] leading-[1.12] text-ink mb-3 mt-3 max-w-3xl">
-        {t(STRINGS.models.title)}
-      </h2>
-      <p className="font-body text-[13px] md:text-[15px] text-ink-muted leading-relaxed max-w-3xl mb-5 md:mb-6">
-        {t(STRINGS.models.sub)}
-      </p>
-
-      <GatewayPanel />
-
-      <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-3">
-        {t(STRINGS.models.directTitle)}
-      </div>
-      <ModelLogos variant="grid" size="md" />
-
-      <p className="mt-5 font-body italic text-[11px] md:text-[11.5px] text-ink-faint max-w-3xl">
-        {t(STRINGS.models.arenaNote)}
-      </p>
-    </section>
-  );
-}
-
-// ── Section 6: Demos (preview iframe + prev/next) ───────────────────────────
-function DemosSection() {
-  const t = useT();
-  return (
-    <section data-snap-id="demos" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-10 md:py-12">
-      <SectionEyebrow num="05" label={STRINGS.demoPreview.eyebrow} />
-      <div className="flex items-end justify-between gap-3 flex-wrap mb-4 mt-3">
-        <h2 className="font-display italic-display text-[26px] sm:text-[30px] md:text-[42px] leading-[1.1] text-ink">
-          {t(STRINGS.demoPreview.title)}
-        </h2>
-        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
-          {t(STRINGS.demoPreview.sub)}
-        </p>
-      </div>
-      <DemoPreview />
-    </section>
-  );
-}
-
-// ── Section 7: Contact + Footer ─────────────────────────────────────────────
+// ── Section 7: Contact ─────────────────────────────────────────────────────
 function ContactSection() {
   const t = useT();
   const links = [

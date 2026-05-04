@@ -10,6 +10,40 @@ export const STRINGS = {
     zh: '把投研变成可 reproduce 的工程',
     en: 'Turn investment research into a reproducible pipeline',
   },
+  heroEyebrow: { zh: 'Uteki · AI 投研', en: 'Uteki · AI Investment Research' },
+  heroBigTitle: {
+    zh: '基于 Agent 进行投资研究',
+    en: 'Agent-driven investment research',
+  },
+  heroSubBody: {
+    zh: '七关公司分析、深度新闻研判、宏观盘面、智能体路由 — 一个工作台。',
+    en: 'Seven-gate company analysis, news deep-reads, macro tape, agent routing — one workbench.',
+  },
+  livePerf: {
+    eyebrow: { zh: '产品表现 · 实盘', en: 'Performance · Live' },
+    chip: { zh: '实盘', en: 'LIVE' },
+    chipNote: { zh: '由 uteki agent 维护的真实账户', en: 'Real account curated by uteki agent' },
+  },
+  demoProcess: {
+    eyebrow: { zh: '流程演示 · 数据为模拟', en: 'Process demo · Mocked data' },
+    title: { zh: '看 Agent 怎么跑这一遍流水线', en: 'See the agent run the pipeline end-to-end' },
+    sub: {
+      zh: '左右翻 5 个产品面，全部内嵌可交互 — 但本节为流程演示，数据为预录脚本回放。',
+      en: 'Flip through five surfaces side-to-side — fully interactive, but data is replayed from scripts for the process demo.',
+    },
+  },
+  real: {
+    eyebrow: { zh: '真实数据', en: 'Real data' },
+    title: { zh: 'Agent 实际跑出来的判断', en: 'What the agent has actually produced' },
+    sub: {
+      zh: '以下为研究台与新闻线的真实分析记录摘要 — 可点击查看完整流水线。',
+      en: 'Curated highlights of real analyses from the studio and news feed — click through for the full pipeline.',
+    },
+    verdictsTab: { zh: '公司裁决', en: 'Company verdicts' },
+    newsTab:     { zh: '新闻解读', en: 'News reads' },
+    openStudio:  { zh: '打开研究台', en: 'Open studio' },
+    openTimeline:{ zh: '打开新闻时间线', en: 'Open news timeline' },
+  },
   demoBadge: {
     zh: '产品演示 · 数据为模拟',
     en: 'Product demo · Mocked data',
