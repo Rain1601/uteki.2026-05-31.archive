@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.vercel
+.env
+.env.local
+.env.*.local
+*.local
+.DS_Store
+.idea
+.vscode
+*.log
+
+# TypeScript / Vite build artefacts (we only commit vite.config.ts)
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
