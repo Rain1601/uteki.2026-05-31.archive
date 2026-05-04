@@ -109,6 +109,12 @@ export default function CompanyAgentStudio() {
 
   const selectedRun = selected ? active[selected] : null;
 
+  // Mobile-only tab — auto-switch to "active" when a run starts
+  const [mobileTab, setMobileTab] = useState<'watchlist' | 'active' | 'log'>('watchlist');
+  useEffect(() => {
+    if (selected && active[selected]) setMobileTab('active');
+  }, [selected, active]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <PageMasthead
@@ -117,9 +123,26 @@ export default function CompanyAgentStudio() {
         subtitle={t(STRINGS.companyPage.subtitle)}
       />
 
+      {/* Mobile tab switcher (lg+ hidden) */}
+      <div className="lg:hidden flex border-b border-ink-faint/25 px-4">
+        {(['watchlist', 'active', 'log'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setMobileTab(tab)}
+            className={`flex-1 py-3 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors ${
+              mobileTab === tab ? 'text-ink border-b-2 border-accent' : 'text-ink-muted'
+            }`}
+          >
+            {tab === 'watchlist' ? t(STRINGS.companyPage.watchlist) :
+             tab === 'active'    ? t(STRINGS.companyPage.queue) :
+                                   t(STRINGS.companyPage.log)}
+          </button>
+        ))}
+      </div>
+
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-0 overflow-hidden">
         {/* Watchlist */}
-        <aside className="border-r border-ink-faint/25 overflow-y-auto">
+        <aside className={`border-r border-ink-faint/25 overflow-y-auto ${mobileTab === 'watchlist' ? '' : 'hidden lg:block'}`}>
           <div className="p-5">
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-3">
               {t(STRINGS.companyPage.watchlist)}
@@ -179,13 +202,13 @@ export default function CompanyAgentStudio() {
         </aside>
 
         {/* Active panel */}
-        <main className="overflow-y-auto px-8 py-6">
+        <main className={`overflow-y-auto px-4 md:px-8 py-4 md:py-6 ${mobileTab === 'active' ? '' : 'hidden lg:block'}`}>
           {!selectedRun && <EmptyPanel />}
           {selectedRun && <ActivePanel run={selectedRun} onAbort={() => abortRun(selectedRun.symbol)} />}
         </main>
 
         {/* Execution log */}
-        <aside className="border-l border-ink-faint/25 overflow-y-auto">
+        <aside className={`border-l border-ink-faint/25 overflow-y-auto ${mobileTab === 'log' ? '' : 'hidden lg:block'}`}>
           <div className="p-5">
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-3">
               {t(STRINGS.companyPage.log)}
@@ -238,17 +261,17 @@ function ActivePanel({ run, onAbort }: { run: ActiveRun; onAbort: () => void }) 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-baseline justify-between mb-6">
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-1">
+      <div className="flex items-baseline justify-between mb-5 md:mb-6 gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-accent mb-1">
             {meta?.sector_zh && (lang === 'zh' ? `${meta.sector_zh} · ${meta.industry_zh}` : `${meta?.sector_en} · ${meta?.industry_en}`)}
           </div>
-          <div className="flex items-baseline gap-3">
-            <span className="font-display italic-display text-[44px] text-ink leading-none">{run.symbol}</span>
-            <span className="font-display italic text-[18px] text-ink-muted">
+          <div className="flex items-baseline gap-2 md:gap-3 flex-wrap">
+            <span className="font-display italic-display text-[32px] md:text-[44px] text-ink leading-none">{run.symbol}</span>
+            <span className="font-display italic text-[14px] md:text-[18px] text-ink-muted">
               {meta ? (lang === 'zh' ? meta.name_zh : meta.name_en) : ''}
             </span>
-            {meta && <span className="font-mono text-[14px] text-ink-muted ml-2">${meta.current_price.toFixed(2)}</span>}
+            {meta && <span className="font-mono text-[12px] md:text-[14px] text-ink-muted">${meta.current_price.toFixed(2)}</span>}
           </div>
         </div>
         {run.status === 'running' && (

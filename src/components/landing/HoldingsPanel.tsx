@@ -31,10 +31,10 @@ export default function HoldingsPanel() {
   const totalAlloc = HOLDINGS.reduce((s, h) => s + h.alloc_pct, 0);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 md:gap-8">
       {/* Left: hero KPIs + holdings table */}
       <div>
-        <div className="flex items-baseline gap-10 flex-wrap mb-8">
+        <div className="flex items-baseline gap-5 md:gap-10 flex-wrap mb-6 md:mb-8">
           <KpiBig label={t(STRINGS.perf.weightedYtd)} value={fmtPct(weighted, 2)} positive={weighted >= 0} />
           <KpiSmall label={t(STRINGS.perf.bestPerformer)} value={`${top.symbol} · ${fmtPct(top.return_pct, 2)}`} positive />
           <KpiSmall label={t(STRINGS.perf.holdings)} value={`${HOLDINGS.length}`} />
@@ -80,9 +80,9 @@ export default function HoldingsPanel() {
       </div>
 
       {/* Right: donut + caption */}
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center mt-2 md:mt-0">
         <Donut holdings={HOLDINGS} totalAlloc={totalAlloc} colors={PIE_COLORS} />
-        <p className="mt-6 font-body italic text-[12.5px] text-ink-faint text-center max-w-xs leading-relaxed">
+        <p className="mt-4 md:mt-6 font-body italic text-[12px] md:text-[12.5px] text-ink-faint text-center max-w-xs leading-relaxed px-4">
           {lang === 'zh'
             ? '为隐私只展示标的、配比与收益率。具体仓位规模不公开。'
             : 'For privacy: tickers, allocation ratios, and returns only. Absolute position sizes are not disclosed.'}
@@ -95,8 +95,8 @@ export default function HoldingsPanel() {
 function KpiBig({ label, value, positive }: { label: string; value: string; positive: boolean }) {
   return (
     <div>
-      <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-2">{label}</div>
-      <div className={`font-display italic-display text-[60px] md:text-[72px] leading-none ${positive ? 'text-gain' : 'text-loss'}`}>
+      <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-1.5 md:mb-2">{label}</div>
+      <div className={`font-display italic-display text-[44px] sm:text-[54px] md:text-[72px] leading-none ${positive ? 'text-gain' : 'text-loss'}`}>
         {value}
       </div>
     </div>

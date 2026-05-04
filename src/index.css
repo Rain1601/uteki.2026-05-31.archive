@@ -66,25 +66,43 @@ body {
   font-optical-sizing: auto;
 }
 
-/* Apple-style snap scroll wrapper */
+/* Apple-style snap scroll wrapper — desktop only */
 .snap-shell {
-  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   overflow-y: auto;
   height: 100vh;
-}
-.snap-shell > section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  min-height: 100vh;
-  height: 100vh;
-}
-@media (max-height: 720px) {
-  .snap-shell > section {
-    height: auto;
-    min-height: 100vh;
-  }
+  -webkit-overflow-scrolling: touch;
 }
 .snap-shell::-webkit-scrollbar {
   width: 0;
+}
+.snap-shell > section {
+  min-height: 100vh;
+  padding-top: 4.5rem; /* clear sticky nav */
+}
+
+@media (min-width: 768px) {
+  .snap-shell {
+    scroll-snap-type: y mandatory;
+  }
+  .snap-shell > section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    height: 100vh;
+    min-height: 100vh;
+    padding-top: 0;
+  }
+  @media (max-height: 720px) {
+    .snap-shell > section {
+      height: auto;
+      min-height: 100vh;
+    }
+  }
+}
+
+/* Mobile: kill horizontal overflow + relax font feature settings */
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
 }

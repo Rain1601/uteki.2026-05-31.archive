@@ -164,20 +164,20 @@ function Slide1NavHeadlines({ account, positions, headlines }: { account: Accoun
   const { lang } = useI18n();
   const top3 = positions.slice(0, 3);
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 h-full">
       <div className="lg:col-span-2 flex flex-col justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-4">
+        <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-accent mb-3 md:mb-4">
           {t(STRINGS.dashboardPage.nav)}
         </div>
-        <div className="font-display italic-display text-[88px] md:text-[120px] leading-[0.95] tracking-[-0.04em] text-ink">
+        <div className="font-display italic-display text-[52px] sm:text-[72px] md:text-[120px] leading-[0.95] tracking-[-0.04em] text-ink break-all">
           {fmtUsd(account.nav_usd)}
         </div>
-        <div className={`mt-5 font-mono text-[16px] flex items-center gap-3 ${account.today_pnl_usd >= 0 ? 'text-gain' : 'text-loss'}`}>
-          {account.today_pnl_usd >= 0 ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
+        <div className={`mt-4 md:mt-5 font-mono text-[13px] md:text-[16px] flex items-center gap-2 md:gap-3 flex-wrap ${account.today_pnl_usd >= 0 ? 'text-gain' : 'text-loss'}`}>
+          {account.today_pnl_usd >= 0 ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
           {fmtUsd(account.today_pnl_usd)} <span className="text-ink-faint">·</span> {fmtPct(account.today_pnl_pct)}
-          <span className="text-ink-faint text-[12px] ml-2">{t(STRINGS.dashboardPage.todayPnl)}</span>
+          <span className="text-ink-faint text-[11px] md:text-[12px] ml-1 md:ml-2">{t(STRINGS.dashboardPage.todayPnl)}</span>
         </div>
-        <div className="mt-12 grid grid-cols-3 gap-6 text-ink-muted font-mono text-[12px]">
+        <div className="mt-6 md:mt-12 grid grid-cols-3 gap-3 md:gap-6 text-ink-muted font-mono text-[11px] md:text-[12px]">
           <Stat label={t(STRINGS.dashboardPage.weekPnl)} value={fmtPct(account.week_pnl_pct)} positive={account.week_pnl_pct >= 0} />
           <Stat label={t(STRINGS.dashboardPage.cash)} value={fmtUsd(account.cash_usd, { compact: true })} />
           <Stat label="YTD" value={fmtPct(account.total_return_pct)} positive />
