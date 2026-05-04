@@ -20,29 +20,39 @@ export const STRINGS = {
     en: 'Seven-gate company analysis, news deep-reads, macro tape, agent routing — one workbench.',
   },
   livePerf: {
-    eyebrow: { zh: '产品表现 · 实盘', en: 'Performance · Live' },
+    eyebrow: { zh: '实际表现', en: 'Live Performance' },
     chip: { zh: '实盘', en: 'LIVE' },
     chipNote: { zh: '由 uteki agent 维护的真实账户', en: 'Real account curated by uteki agent' },
   },
   demoProcess: {
-    eyebrow: { zh: '流程演示 · 数据为模拟', en: 'Process demo · Mocked data' },
+    eyebrow: { zh: '工作流程 · 数据为模拟', en: 'Workflow · Mocked data' },
     title: { zh: '看 Agent 怎么跑这一遍流水线', en: 'See the agent run the pipeline end-to-end' },
     sub: {
-      zh: '左右翻 5 个产品面，全部内嵌可交互 — 但本节为流程演示，数据为预录脚本回放。',
-      en: 'Flip through five surfaces side-to-side — fully interactive, but data is replayed from scripts for the process demo.',
+      zh: '左右翻 5 个产品面，全部内嵌可交互 — 本节为流程演示，数据为预录脚本回放。',
+      en: 'Flip through five surfaces side-to-side — fully interactive, but data is replayed from scripts.',
     },
   },
   real: {
-    eyebrow: { zh: '真实数据', en: 'Real data' },
+    eyebrow: { zh: '真实结果', en: 'Real Results' },
     title: { zh: 'Agent 实际跑出来的判断', en: 'What the agent has actually produced' },
     sub: {
-      zh: '以下为研究台与新闻线的真实分析记录摘要 — 可点击查看完整流水线。',
-      en: 'Curated highlights of real analyses from the studio and news feed — click through for the full pipeline.',
+      zh: '研究台与新闻线的真实分析记录 — 点击展开完整 7 关流水线。',
+      en: 'Real analyses from the studio and news feed — click to expand the full 7-gate pipeline.',
     },
     verdictsTab: { zh: '公司裁决', en: 'Company verdicts' },
     newsTab:     { zh: '新闻解读', en: 'News reads' },
     openStudio:  { zh: '打开研究台', en: 'Open studio' },
     openTimeline:{ zh: '打开新闻时间线', en: 'Open news timeline' },
+    expandPipeline: { zh: '展开完整流水线', en: 'Expand full pipeline' },
+    collapsePipeline: { zh: '收起', en: 'Collapse' },
+    sevenGates: { zh: '七关流水线', en: 'Seven-gate pipeline' },
+    mentorComments: { zh: '三贤评语', en: 'Mentor commentary' },
+  },
+  archSection: {
+    eyebrow: { zh: '系统架构', en: 'System Architecture' },
+  },
+  contactSection: {
+    eyebrow: { zh: '联系我', en: 'Contact me' },
   },
   demoBadge: {
     zh: '产品演示 · 数据为模拟',
@@ -109,8 +119,12 @@ export const STRINGS = {
     eyebrow: { zh: '架构', en: 'Architecture' },
     title: { zh: 'CompanyAgent 是核心', en: 'CompanyAgent is the core' },
     sub: {
-      zh: '七关 ReAct 流水线 + 两次 Reflection + 多模型 Arena 评测 — 整套系统围绕"如何让 AI 做出可信的公司判断"展开。',
-      en: 'Seven-gate ReAct pipeline + two Reflections + multi-model arena evaluation — the whole system is built around "how to make an AI verdict on a company trustworthy."',
+      zh: 'Skill 团队 · RAG · Web Search · Memory · Harness · Arena · Evaluation — 整套真实概念都在这张图里。',
+      en: 'Skill team · RAG · Web Search · Memory · Harness · Arena · Evaluation — every real concept lives in one diagram.',
+    },
+    legend: {
+      zh: '颜色对应：橙=入口/路由 · 绿=研究/工具 · 米黄=深度调研/Skill · 红=记忆/Arena',
+      en: 'Color key: amber = input/router · green = research/tools · cream = skill team · terracotta = memory/arena',
     },
     companyDeepTitle: { zh: 'CompanyAgent · 深度', en: 'CompanyAgent · in detail' },
     companyDeepDesc: {
