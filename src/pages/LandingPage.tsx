@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, ChevronDown, Layers, Vote, Activity,
-  Github, Globe,
+  ArrowUpRight, Github, Globe,
 } from 'lucide-react';
 import { useT, useI18n } from '../i18n/I18nProvider';
 import { STRINGS } from '../i18n/strings';
@@ -14,6 +13,7 @@ import HoldingsPanel from '../components/landing/HoldingsPanel';
 import DemoPreview from '../components/landing/DemoPreview';
 import RealDataSection from '../components/landing/RealDataSection';
 import CopyableEmail from '../components/landing/CopyableEmail';
+import PillarCarousel from '../components/landing/PillarCarousel';
 
 // Story flow: 是什么 → 实际表现 → 真实结果 → 工作流程 → 系统架构 → 联系我
 const SECTIONS = [
@@ -75,7 +75,7 @@ export default function LandingPage() {
           {t(STRINGS.brand)}
         </button>
         <nav className="hidden md:flex items-center gap-6">
-          {SECTIONS.slice(1).map((s) => (
+          {SECTIONS.map((s) => (
             <button
               key={s.id}
               onClick={() => scrollTo(s.id)}
@@ -114,7 +114,7 @@ export default function LandingPage() {
       </aside>
 
       <div ref={shellRef} className="snap-shell">
-        <HeroSection onNext={() => scrollTo('about')} />
+        <HeroSection />
         <AboutSection />
         <PerformanceSection />
         <RealDataSectionWrapper />
@@ -127,15 +127,13 @@ export default function LandingPage() {
 }
 
 // ── Section 1: Hero ──────────────────────────────────────────────────────────
-function HeroSection({ onNext }: { onNext: () => void }) {
+function HeroSection() {
   const t = useT();
   return (
     <section data-snap-id="hero" className="relative flex flex-col items-start justify-center px-6 md:px-14 max-w-7xl mx-auto">
-      {/* Eyebrow brand-line */}
+      {/* Eyebrow brand-line — clean, no demo-tail */}
       <div className="font-mono text-[11px] sm:text-[12px] uppercase tracking-[0.32em] text-accent mb-6 mt-4 md:mt-16 flex items-center gap-3">
         <span className="text-ink">{t(STRINGS.heroEyebrow)}</span>
-        <span className="h-px w-8 bg-accent/50" />
-        <span>{t({ zh: '产品演示 · 数据为模拟', en: 'Demo site · mocked data' })}</span>
       </div>
 
       <h1 className="font-display italic-display text-[40px] sm:text-[52px] md:text-[88px] leading-[1.04] md:leading-[1.0] tracking-[-0.02em] text-ink max-w-5xl">
@@ -154,22 +152,7 @@ function HeroSection({ onNext }: { onNext: () => void }) {
           {t(STRINGS.landing.ctaPrimary)}
           <ArrowUpRight size={16} strokeWidth={1.5} />
         </Link>
-        <button
-          onClick={onNext}
-          className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded border border-ink-faint/40 text-ink-muted font-body text-[14px] sm:text-[15px] hover:text-ink hover:border-accent/60 transition-colors"
-        >
-          {t({ zh: '一直往下', en: 'Scroll for more' })}
-          <ChevronDown size={16} strokeWidth={1.5} />
-        </button>
       </div>
-
-      <button
-        onClick={onNext}
-        aria-label="scroll to next"
-        className="hidden md:block absolute bottom-10 left-1/2 -translate-x-1/2 text-ink-faint hover:text-ink transition-colors animate-shimmer"
-      >
-        <ChevronDown size={28} strokeWidth={1.4} />
-      </button>
     </section>
   );
 }
@@ -177,29 +160,16 @@ function HeroSection({ onNext }: { onNext: () => void }) {
 // ── Section 2: About (产品介绍) ─────────────────────────────────────────────
 function AboutSection() {
   const t = useT();
-  const pillars = [
-    { icon: Layers,   title: STRINGS.about.pillar1Title, desc: STRINGS.about.pillar1Desc, color: '#C9A97E' },
-    { icon: Vote,     title: STRINGS.about.pillar2Title, desc: STRINGS.about.pillar2Desc, color: '#B0524A' },
-    { icon: Activity, title: STRINGS.about.pillar3Title, desc: STRINGS.about.pillar3Desc, color: '#6FAF8D' },
-  ];
   return (
     <section data-snap-id="about" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
       <SectionEyebrow num="01" label={STRINGS.about.eyebrow} />
-      <h2 className="font-display italic-display text-[28px] sm:text-[34px] md:text-[60px] leading-[1.08] text-ink max-w-4xl mb-5 md:mb-6 mt-3">
+      <h2 className="font-display italic-display text-[28px] sm:text-[34px] md:text-[56px] leading-[1.08] text-ink max-w-4xl mb-5 md:mb-6 mt-3">
         {t(STRINGS.about.title)}
       </h2>
-      <p className="font-body text-[14px] sm:text-[15px] md:text-[18px] leading-relaxed text-ink-muted max-w-3xl mb-8 md:mb-12">
+      <p className="font-body text-[14px] sm:text-[15px] md:text-[17px] leading-relaxed text-ink-muted max-w-3xl mb-6 md:mb-8">
         {t(STRINGS.about.p1)}
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
-        {pillars.map(({ icon: Icon, title, desc, color }) => (
-          <div key={title.zh} className="rounded border border-ink-faint/30 bg-[#1a1612]/60 p-4 md:p-6 flex flex-col">
-            <Icon size={22} strokeWidth={1.4} style={{ color }} className="mb-3 md:mb-4" />
-            <h3 className="font-display italic-display text-[18px] md:text-[20px] text-ink mb-2 md:mb-3 leading-tight">{t(title)}</h3>
-            <p className="font-body text-[12.5px] md:text-[13.5px] text-ink-muted leading-relaxed">{t(desc)}</p>
-          </div>
-        ))}
-      </div>
+      <PillarCarousel />
     </section>
   );
 }

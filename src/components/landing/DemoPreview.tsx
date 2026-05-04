@@ -51,7 +51,7 @@ export default function DemoPreview() {
       </div>
 
       {/* Iframe panel with side chevrons */}
-      <div className="relative rounded border border-ink-faint/30 bg-[#0f0d0a] overflow-hidden" style={{ height: 'min(62vh, 540px)', minHeight: 320 }}>
+      <div className="relative rounded border border-ink-faint/30 bg-[#0f0d0a] overflow-hidden" style={{ height: 'min(74vh, 680px)', minHeight: 360 }}>
         <iframe
           key={cur.to}
           src={`${cur.to}?embed=1`}

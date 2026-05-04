@@ -26,10 +26,10 @@ export const STRINGS = {
   },
   demoProcess: {
     eyebrow: { zh: '工作流程 · 数据为模拟', en: 'Workflow · Mocked data' },
-    title: { zh: '看 Agent 怎么跑这一遍流水线', en: 'See the agent run the pipeline end-to-end' },
+    title: { zh: '动手感受每一个产品面', en: 'Get hands-on with every surface' },
     sub: {
-      zh: '左右翻 5 个产品面，全部内嵌可交互 — 本节为流程演示，数据为预录脚本回放。',
-      en: 'Flip through five surfaces side-to-side — fully interactive, but data is replayed from scripts.',
+      zh: '5 个产品面全部内嵌、可点可滚，左右翻页就行。本节数据为预录脚本回放。',
+      en: 'Five product surfaces all embedded — click, scroll, flip through them. Data is replayed from scripts.',
     },
   },
   real: {
@@ -43,10 +43,11 @@ export const STRINGS = {
     newsTab:     { zh: '新闻解读', en: 'News reads' },
     openStudio:  { zh: '打开研究台', en: 'Open studio' },
     openTimeline:{ zh: '打开新闻时间线', en: 'Open news timeline' },
-    expandPipeline: { zh: '展开完整流水线', en: 'Expand full pipeline' },
-    collapsePipeline: { zh: '收起', en: 'Collapse' },
+    expandPipeline: { zh: '查看完整流水线', en: 'View full pipeline' },
+    collapsePipeline: { zh: '关闭', en: 'Close' },
     sevenGates: { zh: '七关流水线', en: 'Seven-gate pipeline' },
     mentorComments: { zh: '三贤评语', en: 'Mentor commentary' },
+    fullTriggers: { zh: '完整触发条件', en: 'Full triggers' },
   },
   archSection: {
     eyebrow: { zh: '系统架构', en: 'System Architecture' },
@@ -104,16 +105,25 @@ export const STRINGS = {
       zh: '七关流水线：业务、成长质量、护城河、管理层、反向测试、估值、综合裁决 — 每一关独立 ReAct loop，结尾两次 Reflection 矫正矛盾。',
       en: 'Seven gates: business, growth quality, moat, management, inversion, valuation, verdict — each an independent ReAct loop, with two Reflection passes auditing contradictions.',
     },
+    pillar1Hint: { zh: '基于 Buffett / Fisher / Munger 三家投资框架，每条裁决都附 conviction + 仓位建议 + 6 条买卖触发。', en: 'Built on the Buffett / Fisher / Munger frameworks; every verdict comes with conviction, position-size guidance, and six buy/sell triggers.' },
     pillar2Title: { zh: '组合级仲裁', en: 'Portfolio Arena' },
     pillar2Desc: {
       zh: '七家头部模型并行跑同一道题，匿名互相投票，自动采纳冠军。胜率、成本、延时全部进入榜单。',
       en: 'Seven flagship models run the same prompt in parallel, vote anonymously, the winner is auto-adopted. Win rate, cost, latency all in the leaderboard.',
     },
+    pillar2Hint: { zh: '内置 Claude / GPT / Gemini / DeepSeek / Qwen / Doubao / MiniMax；可一键切到 OpenRouter 或 AIHubMix 这类网关。', en: 'Built-in Claude / GPT / Gemini / DeepSeek / Qwen / Doubao / MiniMax; one click to swap in a gateway like OpenRouter or AIHubMix.' },
     pillar3Title: { zh: '宏观与新闻雷达', en: 'Macro & News Radar' },
     pillar3Desc: {
       zh: '估值 / 流动性 / 资金流三盏信号灯 + 日历式新闻 + 逐篇 AI 解读 — 不漏掉任何会改变持仓判断的信号。',
       en: 'Three signal lights (Valuation / Liquidity / Flow) + calendar news feed + per-article AI reads — never miss a signal that should change conviction.',
     },
+    pillar3Hint: { zh: '每条新闻自动判定多空 + 对持仓影响；宏观面板每日刷新，板块轮动、风格对比一目了然。', en: 'Every news item auto-tagged with bullish/bearish + portfolio impact; the macro panel refreshes daily — sector rotation and style pairs at a glance.' },
+    pillar4Title: { zh: '可复盘 · 可重放', en: 'Auditable · Replayable' },
+    pillar4Desc: {
+      zh: '每次 Agent 运行的输入（Decision Harness）、思考、工具调用、最终输出都被结构化存档；任何一条决策都能在评测面板里追到源头。',
+      en: 'Every agent run — its input Decision Harness, thoughts, tool calls, and final output — is structurally archived. Any decision can be traced back to its source in the evaluation panel.',
+    },
+    pillar4Hint: { zh: '4 维 + 5 维评测指标：Consistency · Credibility · Logic · Effectiveness · Cost · Latency · Judge Score。', en: '4-D + 5-D evaluation: consistency · credibility · logic · effectiveness · cost · latency · judge score.' },
   },
   arch: {
     eyebrow: { zh: '架构', en: 'Architecture' },
