@@ -7,6 +7,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 import logging
 import os
+from urllib.parse import urlencode
 
 from passlib.context import CryptContext
 
@@ -30,6 +31,18 @@ pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_frontend_url() -> str:
     """获取前端URL，用于登录后重定向"""
     return os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+
+def get_login_error_url(frontend_url: str, error: str, detail: Optional[str] = None) -> str:
+    """Build a login error redirect without duplicating /login."""
+    base_url = frontend_url.rstrip("/")
+    if not base_url.endswith("/login"):
+        base_url = f"{base_url}/login"
+
+    params = {"error": error}
+    if detail:
+        params["detail"] = detail
+    return f"{base_url}?{urlencode(params)}"
 
 
 # =============================================================================
@@ -61,13 +74,15 @@ async def github_callback(
         user_info = await auth_service.exchange_github_code(code)
         if not user_info:
             logger.error("GitHub OAuth: Failed to get user info")
-            return RedirectResponse(url=f"{frontend_url}/login?error=github_auth_failed")
+            return RedirectResponse(
+                url=get_login_error_url(frontend_url, "github_auth_failed")
+            )
 
         logger.info(f"GitHub OAuth: Got user info for {user_info.get('email')}")
 
-        user = await user_service.get_or_create_oauth_user(
-            oauth_provider=user_info["provider"],
-            oauth_id=user_info["provider_id"],
+        user = await auth_service.find_or_create_web_oauth_user(
+            provider=user_info["provider"],
+            provider_subject=user_info["provider_id"],
             email=user_info.get("email"),
             username=user_info.get("name"),
             avatar_url=user_info.get("avatar"),
@@ -92,7 +107,9 @@ async def github_callback(
     except Exception as e:
         logger.error(f"GitHub OAuth callback error: {str(e)}", exc_info=True)
         return RedirectResponse(
-            url=f"{frontend_url}/login?error=github_callback_error&detail={str(e)[:100]}"
+            url=get_login_error_url(
+                frontend_url, "github_callback_error", detail=str(e)[:100]
+            )
         )
 
 
@@ -125,13 +142,15 @@ async def google_callback(
         user_info = await auth_service.exchange_google_code(code)
         if not user_info:
             logger.error("Google OAuth: Failed to get user info")
-            return RedirectResponse(url=f"{frontend_url}/login?error=google_auth_failed")
+            return RedirectResponse(
+                url=get_login_error_url(frontend_url, "google_auth_failed")
+            )
 
         logger.info(f"Google OAuth: Got user info for {user_info.get('email')}")
 
-        user = await user_service.get_or_create_oauth_user(
-            oauth_provider=user_info["provider"],
-            oauth_id=user_info["provider_id"],
+        user = await auth_service.find_or_create_web_oauth_user(
+            provider=user_info["provider"],
+            provider_subject=user_info["provider_id"],
             email=user_info.get("email"),
             username=user_info.get("name"),
             avatar_url=user_info.get("avatar"),
@@ -156,7 +175,9 @@ async def google_callback(
     except Exception as e:
         logger.error(f"Google OAuth callback error: {str(e)}", exc_info=True)
         return RedirectResponse(
-            url=f"{frontend_url}/login?error=google_callback_error&detail={str(e)[:100]}"
+            url=get_login_error_url(
+                frontend_url, "google_callback_error", detail=str(e)[:100]
+            )
         )
 
 

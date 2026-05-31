@@ -180,6 +180,40 @@ class AuthService:
             }
         )
 
+    async def find_or_create_web_oauth_user(
+        self,
+        provider: str,
+        provider_subject: str,
+        email: Optional[str],
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+    ) -> dict:
+        """
+        Find or create a web OAuth user using the legacy users table.
+
+        The mobile auth provider-binding table is not available through this
+        repository in every local/Supabase environment, so web OAuth keeps using
+        admin.users and merges by email to avoid duplicate-email failures.
+        """
+        user = await UserRepository.get_by_oauth(provider, provider_subject)
+        if user:
+            return user
+
+        user = await UserRepository.get_by_email(email) if email else None
+        if user:
+            return user
+
+        from uuid import uuid4
+        user_data: Dict[str, Any] = {
+            "id": str(uuid4()),
+            "email": email or f"{provider}_{provider_subject}@no-email.local",
+            "username": username or provider_subject[:50],
+            "oauth_provider": provider,
+            "oauth_id": provider_subject,
+            "avatar_url": avatar_url,
+        }
+        return await UserRepository.create(user_data)
+
     async def find_or_merge_user(
         self,
         provider: str,
