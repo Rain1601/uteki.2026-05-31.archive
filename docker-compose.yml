@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: uteki_dev_pass
       POSTGRES_DB: uteki
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
