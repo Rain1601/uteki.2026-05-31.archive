@@ -375,7 +375,7 @@ class DatabaseManager:
 
             # 创建异步引擎
             engine_kwargs = {
-                "echo": settings.debug,
+                "echo": settings.sqlalchemy_echo,
             }
 
             # SQLite和PostgreSQL的配置不同
