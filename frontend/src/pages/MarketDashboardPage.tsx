@@ -14,6 +14,7 @@ import {
 import { useTheme } from '../theme/ThemeProvider';
 import { useResponsive } from '../hooks/useResponsive';
 import LoadingDots from '../components/LoadingDots';
+import InterpretationPanel from '../components/macro/InterpretationPanel';
 import {
   getDashboardOverview,
   getValuationDetail,
@@ -604,13 +605,16 @@ export default function MarketDashboardPage() {
 
       {/* ─── Content ─── */}
       <Box sx={{
-        flex: 1, minHeight: 0, overflowY: 'auto', px: 2.5, py: 2,
+        flex: 1, minHeight: 0, overflowY: 'auto',
         '&::-webkit-scrollbar': { width: 4 },
         '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
         '&::-webkit-scrollbar-thumb': { bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', borderRadius: 4 },
       }}>
+        {/* AI Interpretation panel (only on charts view) */}
+        {activeView === 'charts' && <InterpretationPanel />}
+
         {activeView === 'charts' && (
-          <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+          <Box sx={{ maxWidth: 1400, mx: 'auto', px: 2.5, py: 2 }}>
             {/* ── Signal overview cards ── */}
             <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5 }}>
               {sortedCats.map(cat => (
@@ -652,8 +656,6 @@ export default function MarketDashboardPage() {
             <Box
               sx={{
                 height: { xs: 'calc(100vh - 128px)', md: 'calc(100vh - 100px)' },
-                mx: { xs: -1.5, md: -2.5 },
-                mt: -2,
               }}
             >
               <TradingViewHeatmap theme={theme} isDark={isDark} source={heatmapSource} />

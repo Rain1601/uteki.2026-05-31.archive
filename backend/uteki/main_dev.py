@@ -14,7 +14,7 @@ from uteki.common.logging_config import setup_logging
 
 # 配置日志系统
 setup_logging(
-    log_level="DEBUG",  # 开发环境使用 DEBUG 级别
+    log_level=settings.log_level,
     log_dir="./logs",
     log_file_prefix="uteki_dev",  # 日志文件: uteki_dev.log, uteki_dev.log.2026-02-01
     backup_count=30  # 保留30天的日志
@@ -30,22 +30,41 @@ async def lifespan(app: FastAPI):
     await db_manager.initialize()
     logger.info("✅ Database initialization completed")
 
-    # Start news scheduler (CNBC Jeff Cox + Bloomberg)
-    from uteki.schedulers import get_news_scheduler
-    news_sched = get_news_scheduler()
-    news_sched.start()
-    logger.info("✅ News scheduler started")
+    started_schedulers: list[tuple[str, object, str]] = []
 
-    # Start index scheduler (daily price update)
-    from uteki.schedulers import get_index_scheduler
-    idx_sched = get_index_scheduler()
-    idx_sched.start()
+    if settings.enable_dev_schedulers:
+        # Start news scheduler (CNBC Jeff Cox + Bloomberg)
+        from uteki.schedulers import get_news_scheduler
+        news_sched = get_news_scheduler()
+        news_sched.start()
+        started_schedulers.append(("News scheduler", news_sched, "stop"))
+        logger.info("✅ News scheduler started")
+
+        # Start index scheduler (daily price update)
+        from uteki.schedulers import get_index_scheduler
+        idx_sched = get_index_scheduler()
+        idx_sched.start()
+        started_schedulers.append(("Index scheduler", idx_sched, "stop"))
+        logger.info("✅ Index scheduler started")
+
+        # Start macro scheduler (daily AI dashboard interpretation @ 22:00 UTC)
+        from uteki.schedulers.macro_scheduler import get_macro_scheduler
+        macro_sched = get_macro_scheduler()
+        macro_sched.start()
+        started_schedulers.append(("Macro scheduler", macro_sched, "shutdown"))
+        logger.info("✅ Macro scheduler started")
+    else:
+        logger.info("Local development schedulers disabled (ENABLE_DEV_SCHEDULERS=false)")
 
     yield
 
     logger.info("Application shutting down...")
-    news_sched.stop()
-    idx_sched.stop()
+    for name, scheduler, stop_method in reversed(started_schedulers):
+        try:
+            getattr(scheduler, stop_method)()
+            logger.info("%s stopped", name)
+        except Exception as e:
+            logger.warning("Failed to stop %s: %s", name, e)
 
 
 # 创建FastAPI应用

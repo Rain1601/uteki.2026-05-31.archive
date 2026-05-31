@@ -133,6 +133,7 @@ class Settings(BaseSettings):
     # 开发配置
     sqlalchemy_echo: bool = False
     reload: bool = True
+    enable_dev_schedulers: bool = False
     enable_profiling: bool = False
 
     # Tushare (US daily klines + PE/PB/市值)

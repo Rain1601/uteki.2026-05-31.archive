@@ -1,4 +1,4 @@
-import { get } from './client';
+import { get, post } from './client';
 import {
   OverviewResponse,
   DetailResponse,
@@ -57,6 +57,65 @@ export async function getMarketCapList(assetType?: string, limit = 200): Promise
   } catch (error) {
     console.error('Failed to fetch market cap list:', error);
     return { success: false, data: [], total: 0 };
+  }
+}
+
+/* ─── AI Interpretation ─── */
+
+export interface MacroKeySignal {
+  category: string;
+  indicator_id: string;
+  indicator_name: string;
+  level: 'high' | 'medium' | 'low';
+  comment: string;
+}
+
+export interface MacroInterpretationPayload {
+  overview: string;
+  valuation_reading: string;
+  liquidity_reading: string;
+  flow_reading: string;
+  key_signals: MacroKeySignal[];
+  vs_yesterday: string | null;
+  watchpoints: string[];
+}
+
+export interface MacroInterpretation {
+  id: string;
+  as_of_date: string; // YYYY-MM-DD
+  payload: MacroInterpretationPayload;
+  dashboard_snapshot: { categories?: any[] };
+  provider: string;
+  model: string;
+  latency_ms: number | null;
+  source_tag: string | null;
+  created_at: string;
+}
+
+export interface InterpretationResponse {
+  today: MacroInterpretation | null;
+  previous: MacroInterpretation | null;
+}
+
+export async function getInterpretation(): Promise<InterpretationResponse> {
+  try {
+    return await get<InterpretationResponse>('/api/macro/dashboard/interpretation');
+  } catch (error) {
+    console.error('Failed to fetch interpretation:', error);
+    return { today: null, previous: null };
+  }
+}
+
+export async function generateInterpretation(force = false): Promise<MacroInterpretation | null> {
+  try {
+    const res = await post<{ status: string; interpretation: MacroInterpretation }>(
+      `/api/macro/dashboard/interpretation/generate${force ? '?force=true' : ''}`,
+      {},
+    );
+    return res.interpretation;
+  } catch (error) {
+    console.error('Failed to generate interpretation:', error);
+    return null;
   }
 }
 
