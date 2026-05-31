@@ -259,13 +259,16 @@ export default function CompanyAgentStudio() {
   const abortRun = useCompanyAgentRunStore((s) => s.abort);
   const removeRun = useCompanyAgentRunStore((s) => s.removeRun);
 
-  // Tick to refresh elapsed-time displays without re-rendering the store
+  // Tick to refresh elapsed-time displays for both live store runs AND
+  // detached server-side rows.
   const [, setTick] = useState(0);
+  const liveCount = runs.size;
+  const dbRunningCount = analyses.filter((a) => a.status === 'running').length;
   useEffect(() => {
-    if (runs.size === 0) return;
+    if (liveCount === 0 && dbRunningCount === 0) return;
     const t = setInterval(() => setTick((n) => n + 1), 500);
     return () => clearInterval(t);
-  }, [runs.size > 0]);
+  }, [liveCount, dbRunningCount]);
 
   // Persist watchlist
   useEffect(() => { saveWatchlist(watchlist); }, [watchlist]);
@@ -294,6 +297,17 @@ export default function CompanyAgentStudio() {
       }
     }
   }, [runs, reloadAnalyses, removeRun]);
+
+  // Poll the analyses list while there are server-side running rows. This
+  // covers the case where the user kicked off a run, refreshed the page (which
+  // killed the in-memory SSE), but the backend keeps churning. Without polling
+  // we'd never notice the row flipping to completed.
+  const dbHasRunning = analyses.some((a) => a.status === 'running');
+  useEffect(() => {
+    if (!dbHasRunning) return;
+    const t = setInterval(() => { void reloadAnalyses(); }, 8000);
+    return () => clearInterval(t);
+  }, [dbHasRunning, reloadAnalyses]);
 
   // ── Execute (kicks off SSE via store) ──
   const handleExecute = useCallback((symbol: string, provider: string = DEFAULT_PROVIDER) => {
@@ -331,8 +345,24 @@ export default function CompanyAgentStudio() {
   };
 
   // ── Derived ──
-  const runningArr = Array.from(runs.values()).sort((a, b) => b.startTime - a.startTime);
-  const runningSymbols = new Set(runningArr.map((r) => r.symbol));
+  // Live runs (with full SSE state) take precedence; DB-running rows that
+  // aren't in the store get rendered as a "detached" variant — the analysis
+  // is alive on the server but we lost the SSE stream (page refresh, etc.).
+  const liveRuns = Array.from(runs.values()).sort((a, b) => b.startTime - a.startTime);
+  const liveAnalysisIds = new Set(liveRuns.map((r) => r.analysisId).filter(Boolean) as string[]);
+  const detachedRuns = analyses
+    .filter((a) => a.status === 'running' && !liveAnalysisIds.has(a.id))
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const totalRunning = liveRuns.length + detachedRuns.length;
+  const runningSymbols = new Set([
+    ...liveRuns.map((r) => r.symbol),
+    ...detachedRuns.map((a) => a.symbol),
+  ]);
+
+  // Filter the log to show only NON-running rows (running ones live in the
+  // queue above instead).
+  const completedAnalyses = analyses.filter((a) => a.status !== 'running');
 
   // ── Render ──
   return (
@@ -380,7 +410,7 @@ export default function CompanyAgentStudio() {
           <Typography sx={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontSize: 16, color: COLOR_INK_MUTED }}>
             Studio
           </Typography>
-          <MonoCaps>关注 {watchlist.length} · 在跑 {runningArr.length} · 历史 {analyses.length}</MonoCaps>
+          <MonoCaps>关注 {watchlist.length} · 在跑 {totalRunning} · 历史 {completedAnalyses.length}</MonoCaps>
         </Box>
         <Box
           onClick={() => navigate('/company-agent/new')}
@@ -592,12 +622,12 @@ export default function CompanyAgentStudio() {
               <Typography sx={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontSize: 22, color: COLOR_INK, letterSpacing: '-0.015em', fontVariationSettings: '"opsz" 72, "SOFT" 60' }}>
                 正在起草
               </Typography>
-              <ItalicSerif size={13} color={COLOR_INK_MUTED}>active drafts · {runningArr.length}</ItalicSerif>
+              <ItalicSerif size={13} color={COLOR_INK_MUTED}>active drafts · {totalRunning}</ItalicSerif>
             </Box>
             <MonoCaps size={9}>后台执行 · 异步</MonoCaps>
           </Box>
 
-          {runningArr.length === 0 && (
+          {totalRunning === 0 && (
             <Box sx={{ py: 8, textAlign: 'center' }}>
               <ItalicSerif size={18} color={COLOR_INK_FAINT}>— 暂无在跑研究 —</ItalicSerif>
               <Typography sx={{ fontFamily: FONT_BODY, fontStyle: 'italic', fontSize: 12, color: COLOR_INK_FAINT, mt: 1.2 }}>
@@ -606,8 +636,78 @@ export default function CompanyAgentStudio() {
             </Box>
           )}
 
+          {/* Detached runs (server-running, no live SSE — surfaces them after a refresh) */}
+          {detachedRuns.length > 0 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: liveRuns.length > 0 ? 2 : 0 }}>
+              {detachedRuns.map((a) => {
+                const elapsedMs = Date.now() - new Date(a.created_at).getTime();
+                return (
+                  <Box
+                    key={a.id}
+                    onClick={() => navigate(`/company-agent/${a.id}`)}
+                    sx={{
+                      border: `1px dashed ${COLOR_INK_FAINT}88`,
+                      bgcolor: 'rgba(244,236,223,0.015)',
+                      p: 3,
+                      cursor: 'pointer',
+                      position: 'relative',
+                      transition: 'all 200ms',
+                      '&:hover': { borderColor: COLOR_INK_MUTED, bgcolor: 'rgba(244,236,223,0.04)' },
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 1.4 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.6 }}>
+                        <Typography sx={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontSize: 30, color: COLOR_INK, letterSpacing: '-0.015em', lineHeight: 1, fontVariationSettings: '"opsz" 144, "WONK" 1', fontWeight: 600 }}>
+                          {a.symbol}
+                        </Typography>
+                        <ItalicSerif size={14} color={COLOR_INK_MUTED}>{a.company_name}</ItalicSerif>
+                        <MonoCaps size={9}>{a.provider}{a.model ? `/${a.model}` : ''}</MonoCaps>
+                        <MonoCaps size={9} color={COLOR_NEUTRAL}>后台运行 · 无实时进度</MonoCaps>
+                      </Box>
+                      <Typography sx={{ fontFamily: FONT_MONO, fontSize: 13, color: COLOR_INK, fontFeatureSettings: '"tnum"' }}>
+                        {fmtElapsedMs(elapsedMs)}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 0.6, mb: 1 }}>
+                      {Array.from({ length: TOTAL_GATES }).map((_, i) => (
+                        <Box
+                          key={i}
+                          sx={{
+                            flex: 1, height: 3,
+                            bgcolor: COLOR_INK_FAINT + '55',
+                            position: 'relative',
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute', inset: 0,
+                              background: `repeating-linear-gradient(90deg, ${COLOR_INK_FAINT}88 0 4px, transparent 4px 8px)`,
+                              animation: 'studio-detached-march 2s linear infinite',
+                              '@keyframes studio-detached-march': {
+                                '0%': { transform: 'translateX(-8px)' },
+                                '100%': { transform: 'translateX(0)' },
+                              },
+                            },
+                          }}
+                        />
+                      ))}
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <ItalicSerif size={12} color={COLOR_INK_FAINT}>
+                        刷新页面后丢失了 SSE 连接 — 后台仍在跑，完成后会自动出现在历史
+                      </ItalicSerif>
+                      <Typography sx={{ fontFamily: FONT_MONO, fontSize: 9.5, color: COLOR_INK_MUTED, letterSpacing: '0.18em' }}>
+                        点击查看 →
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {runningArr.map((job) => {
+            {liveRuns.map((job) => {
               const pct = (job.currentGate / TOTAL_GATES) * 100;
               const gateIdx = Math.max(0, job.currentGate - 1);
               const gateName = GATE_TITLES[Math.min(gateIdx, TOTAL_GATES - 1)];
@@ -721,7 +821,7 @@ export default function CompanyAgentStudio() {
           <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 2.5 }}>
             <MonoCaps size={9.5}>执行记录 · log</MonoCaps>
             <Typography sx={{ fontFamily: FONT_MONO, fontSize: 10, color: COLOR_INK_MUTED, fontFeatureSettings: '"tnum"' }}>
-              {analyses.length} entries
+              {completedAnalyses.length} entries
             </Typography>
           </Box>
 
@@ -731,14 +831,14 @@ export default function CompanyAgentStudio() {
             </Typography>
           )}
 
-          {!loadingAnalyses && analyses.length === 0 && (
+          {!loadingAnalyses && completedAnalyses.length === 0 && (
             <Typography sx={{ fontFamily: FONT_BODY, fontStyle: 'italic', fontSize: 12, color: COLOR_INK_FAINT, textAlign: 'center', py: 4 }}>
               暂无历史分析
             </Typography>
           )}
 
           <Box>
-            {analyses.map((entry, idx) => {
+            {completedAnalyses.map((entry, idx) => {
               const c = verdictColor(entry.verdict_action);
               const dur = fmtDuration(entry.total_latency_ms);
               return (
@@ -747,7 +847,7 @@ export default function CompanyAgentStudio() {
                   onClick={() => handleOpenLog(entry.id)}
                   sx={{
                     py: 1.4,
-                    borderBottom: idx < analyses.length - 1 ? `1px dashed ${COLOR_INK_FAINT}33` : 'none',
+                    borderBottom: idx < completedAnalyses.length - 1 ? `1px dashed ${COLOR_INK_FAINT}33` : 'none',
                     cursor: 'pointer',
                     transition: 'all 200ms',
                     '&:hover': { bgcolor: 'rgba(244,236,223,0.03)', mx: -1, px: 1 },
