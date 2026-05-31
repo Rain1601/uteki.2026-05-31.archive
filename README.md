@@ -1,155 +1,97 @@
-# uteki.open
+# uteki.app
 
-Open-source AI-powered quantitative trading platform for individual traders.
+Public product showcase site for the **uteki** investing-agent product
+(developed at `uteki.open` / uteki.dev). This repo is a **fully self-contained
+Vite + React SPA** — no backend, no auth, no live data. All five product
+surfaces, including the streamed agent flows, play out from local mock
+fixtures so the site can be deployed anywhere static.
 
-## Features
+## What's inside
 
-- **6 Domain Architecture**: Admin, Trading, Data, Agent, Evaluation, Dashboard
-- **Multi-Database Strategy**: PostgreSQL + ClickHouse + Qdrant + Redis + MinIO
-- **AI Agent Framework**: Unified SDK supporting OpenAI, Claude, DeepSeek, Qwen
-- **Multi-Asset Support**: Crypto, Stocks (US), Commodities
-- **Enterprise-Grade Evaluation**: OpenAI Evals + Anthropic alignment testing
-- **One-Command Deployment**: Docker Compose for local setup
+Five surfaces, all reachable from the landing page (`/`):
 
-## Quick Start (5分钟)
+| Route                          | What it shows                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `/dashboard`                   | Editorial four-slide daily brief: NAV, holdings matrix, agent verdicts, model leaderboard. Use ← / → to switch slides. |
+| `/macro/market-dashboard`      | Three signal cards (Valuation / Liquidity / Flow) with 52-week sparks, sector rotation bars, and style-pair comparisons. |
+| `/news-timeline`               | Calendar-driven news feed. Click "AI 解读 / AI read" on any card to stream a mocked impact analysis. |
+| `/agent`                       | Read-only composer with three scripted prompts. Chat-mode chips stream a token-by-token answer; the research-mode chip plays a full thoughts → sources → answer pipeline. |
+| `/company-agent`               | Three-column research studio. Pick AAPL / NVDA / BRK.B and watch the seven-gate analysis pipeline stream to a final verdict. |
 
-### 🎯 一键部署
+A 中 / EN toggle in the masthead switches every UI string and every streamed
+script between Chinese and English.
 
-```bash
-# 1. 克隆项目
-git clone https://github.com/yourusername/uteki.open.git
-cd uteki.open
-
-# 2. 启动所有数据库 (PostgreSQL, Redis, ClickHouse, Qdrant, MinIO)
-./scripts/start-full.sh
-
-# 3. 初始化数据库表
-cd backend
-poetry install
-poetry run python ../scripts/init_database.py
-
-# 4. 启动后端
-poetry run python -m uteki.main
-
-# 5. 在新终端启动前端
-cd frontend
-pnpm install
-pnpm dev
-```
-
-### 🔍 验证系统
+## Run locally
 
 ```bash
-# 运行完整性验证脚本
-./scripts/verify_system.sh
+npm install
+npm run dev          # http://localhost:5173
+npm run build        # production bundle into ./dist
+npm run preview      # serve the production bundle
 ```
 
-### 📍 访问地址
+## Deploy to Vercel
 
-- **后端API文档**: http://localhost:8888/docs
-- **后端健康检查**: http://localhost:8888/health
-- **前端界面**: http://localhost:5173
-- **MinIO控制台**: http://localhost:9001 (uteki / uteki_dev_pass)
-
-### ❓ 关于数据库"注册"
-
-**重要**: PostgreSQL、ClickHouse、Redis等数据库**无需注册或申请账号**。它们是开源软件，通过Docker本地运行，配置信息都在`docker-compose.yml`中预定义。详见 [FAQ.md](docs/FAQ.md)
-
-### 📚 详细文档
-
-- **[在线文档站点](https://uteki-open.vercel.app)** (推荐)
-- [快速启动](QUICKSTART.md) - 5分钟本地部署
-- [贡献指南](CONTRIBUTING.md) - 代码规范和提交流程
-- [架构设计](docs/ARCHITECTURE.md) - Agent扩展策略
-- [完整部署指南](docs/DEPLOYMENT_GUIDE.md) - 生产环境配置
-
-## Configuration
-
-1. Create `.env` file in `backend/`:
-   ```env
-   DATABASE_URL=postgresql://uteki:uteki_dev_pass@localhost:5432/uteki
-   CLICKHOUSE_HOST=localhost
-   CLICKHOUSE_PORT=8123
-   QDRANT_HOST=localhost
-   QDRANT_PORT=6333
-   REDIS_URL=redis://localhost:6379
-   MINIO_ENDPOINT=localhost:9000
-   MINIO_ACCESS_KEY=uteki
-   MINIO_SECRET_KEY=uteki_dev_pass
-   ```
-
-2. Configure API keys in `/admin` page:
-   - LLM providers (OpenAI, Claude, DeepSeek, Qwen)
-   - Exchanges (OKX, Binance, Interactive Brokers)
-   - Data sources (FMP)
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Frontend (React 18)                     │
-│                   /admin /evaluate                          │
-└────────────────────────┬────────────────────────────────────┘
-                         │ HTTP/WebSocket
-┌────────────────────────┴────────────────────────────────────┐
-│                    Backend (FastAPI)                        │
-│  ┌──────┐  ┌────────┐  ┌──────┐  ┌───────┐  ┌──────────┐  │
-│  │Admin │  │Trading │  │ Data │  │ Agent │  │Evaluation│  │
-│  └──┬───┘  └───┬────┘  └───┬──┘  └───┬───┘  └────┬─────┘  │
-└─────┼─────────┼───────────┼─────────┼───────────┼─────────┘
-      │         │           │         │           │
-┌─────┴─────────┴───────────┴─────────┴───────────┴─────────┐
-│  PostgreSQL  ClickHouse  Qdrant  Redis  MinIO              │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Domain Responsibilities
-
-| Domain | Responsibility |
-|--------|----------------|
-| **Admin** | System configuration, API keys, LLM/exchange setup |
-| **Trading** | Order execution, position tracking, risk management |
-| **Data** | Multi-asset data pipeline (daily K-lines, on-chain, financials) |
-| **Agent** | AI agent framework, tool system, multi-agent orchestration |
-| **Evaluation** | Performance metrics, benchmarks, A/B testing |
-| **Dashboard** | Trading history visualization, P&L tracking |
-
-## Development
-
-### Run Tests
 ```bash
-cd backend
-poetry run pytest
+npx vercel --yes              # preview deployment
+npx vercel --prod --yes       # production
 ```
 
-### Lint Code
-```bash
-poetry run ruff check .
-poetry run mypy .
-```
+`vercel.json` configures the SPA rewrite (`framework: vite`). No environment
+variables are required.
 
-### Format Code
-```bash
-poetry run ruff format .
-```
+## How the mocked streams work
 
-## Documentation
+Real-feel streaming without a backend: every interactive surface reads from a
+small async generator in `src/mocks/` that yields events with realistic
+inter-token delays (`src/mocks/stream.ts`). The page-level consumers are
+written exactly as if they were reading SSE — `for await (const ev of
+stream(...)) { ... }` — so swapping in a real server later is a one-line
+change per page.
 
-- [部署指南 Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - 完整部署文档（macOS/Linux）
-- [常见问题 FAQ](docs/FAQ.md) - 数据库配置、注册说明
-- [数据库策略 Database Strategy](docs/DATABASE_STRATEGY.md) - 多数据库架构
-- [数据分发 Data Distribution](docs/DATA_DISTRIBUTION.md) - 数据获取方案
-- [API Reference](http://localhost:8888/docs) - 在线API文档
+Scripts live alongside the mocks:
 
-## License
+- `mocks/agent.ts` — `chatStream()` and `researchStream()` for the three
+  scripted prompts on `/agent`.
+- `mocks/company.ts` — `runCompanyAnalysis()` emits the seven-gate pipeline
+  for AAPL / NVDA / BRK.B.
+- `mocks/news.ts` — `analyzeNewsStream()` produces an impact read keyed off
+  each news item's tags.
 
-MIT License - see [LICENSE](LICENSE) file for details.
+Static fixtures (dashboard, market dashboard) live in the same folder and
+return Promises with small artificial delays so loading states render.
 
-## Contributing
+## Design system
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Tokens are ported from `uteki.open` so the two sites are visually identical —
+warm editorial dark palette, Fraunces italic display, Newsreader body,
+JetBrains Mono for numerics. See `src/theme/editorialTokens.ts`.
 
-## Support
+## Tech
 
-- GitHub Issues: https://github.com/yourusername/uteki.open/issues
-- GitHub Discussions: https://github.com/yourusername/uteki.open/discussions
+Vite 5 · React 18 + TypeScript · MUI 6 (theme only) · Tailwind 3 ·
+React Router 6 · framer-motion · recharts · lucide-react.
+
+No external network calls at runtime besides Google Fonts.
+
+---
+
+## Implementation archive (`uteki.open`)
+
+This repository also archives the original `uteki.open` source tree that
+the showcase is built on. The deployed Vercel surface is the Vite SPA at
+this repo's root; the archive lives in:
+
+- `backend/` — FastAPI + SQLAlchemy + multi-LLM adapter. 7-Gate Company
+  Agent, 3-phase Arena, ConsistencyRunner, Provenance/`as_of` catalog.
+- `frontend/` — The original React/MUI app (Studio / Dossier / Market
+  Dashboard / Admin) that the showcase mocks here.
+- `mobile/` — Flutter shell (scaffold only).
+- `docs/RETROSPECTIVE.md` — 4-month send-off doc covering what the
+  project tried, what worked, what didn't, and how we collaborated with
+  code agents.
+- `docs/ADR-evaluation-framework.md` — Design rationale behind the
+  evaluation pillars (consistency / credibility / logic / effectiveness).
+
+The archive is **read-only** going forward — active development lives in
+the separate [`uteki`](https://github.com/Rain1601) monorepo.

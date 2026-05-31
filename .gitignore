@@ -27,71 +27,65 @@ venv/
 env/
 ENV/
 .venv
-
 # Poetry
 poetry.lock
-
 # PyCharm / IntelliJ
 .idea/
-
 # VS Code
 .vscode/
-
 # Claude Code
 .claude/
 .codex/
 .cursor/
-
 # macOS
 .DS_Store
-
 # Database
 *.db
 *.sqlite
 *.sqlite3
-
 # Logs (keep directory structure, ignore all log files including rotated)
 logs/
 *.log.*
-
 # Environment variables
 .env
 .env.local
-
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
-
 # MyPy
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
 # Ruff
 .ruff_cache/
-
 # Node.js (for frontend)
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-
 # Frontend build
 frontend/dist/
 frontend/build/
-
 # Docker
-*.log
-
 # SQL scripts (migrations managed externally)
 backend/uteki/scripts/*.sql
-
 # OpenSpec change artifacts (design docs, not code)
 openspec/changes/
 backend/openspec/
-
 # Backup files
 *.bak
 *.backup
+node_modules
+dist
+dist-ssr
+.vercel
+.env.*.local
+*.local
+.idea
+.vscode
+# TypeScript / Vite build artefacts (we only commit vite.config.ts)
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

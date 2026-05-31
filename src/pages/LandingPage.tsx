@@ -1,0 +1,325 @@
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ArrowUpRight, Github, Globe,
+} from 'lucide-react';
+import { useT, useI18n } from '../i18n/I18nProvider';
+import { STRINGS } from '../i18n/strings';
+import LangToggle from '../components/LangToggle';
+import { BACKGROUND_PAPER, COLOR_BG, COLOR_INK } from '../theme/editorialTokens';
+import MultiAgentDiagram from '../components/landing/MultiAgentDiagram';
+import ModelLogos from '../components/landing/ModelLogos';
+import HoldingsPanel from '../components/landing/HoldingsPanel';
+import DemoPreview from '../components/landing/DemoPreview';
+import RealDataSection from '../components/landing/RealDataSection';
+import CopyableEmail from '../components/landing/CopyableEmail';
+import PillarCarousel from '../components/landing/PillarCarousel';
+
+// Story flow: 是什么 → 实际表现 → 真实结果 → 工作流程 → 系统架构 → 联系我
+const SECTIONS = [
+  { id: 'hero',         labelZh: '首页',     labelEn: 'Top' },
+  { id: 'about',        labelZh: '产品介绍', labelEn: 'About' },
+  { id: 'performance',  labelZh: '实际表现', labelEn: 'Performance' },
+  { id: 'real',         labelZh: '真实结果', labelEn: 'Real Results' },
+  { id: 'demos',        labelZh: '工作流程', labelEn: 'Workflow' },
+  { id: 'architecture', labelZh: '系统架构', labelEn: 'Architecture' },
+  { id: 'contact',      labelZh: '联系我',   labelEn: 'Contact' },
+];
+
+export default function LandingPage() {
+  const t = useT();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const sections = shell.querySelectorAll<HTMLElement>('section[data-snap-id]');
+    const obs = new IntersectionObserver(
+      (entries) => {
+        let bestIdx = -1;
+        let bestRatio = 0;
+        entries.forEach((e) => {
+          const idx = SECTIONS.findIndex((s) => s.id === (e.target as HTMLElement).dataset.snapId);
+          if (idx === -1) return;
+          if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+            bestIdx = idx;
+            bestRatio = e.intersectionRatio;
+          }
+        });
+        if (bestIdx >= 0) setActiveIdx(bestIdx);
+      },
+      { root: shell, threshold: [0.4, 0.6, 0.8] },
+    );
+    sections.forEach((s) => obs.observe(s));
+    return () => obs.disconnect();
+  }, []);
+
+  function scrollTo(id: string) {
+    const shell = shellRef.current;
+    if (!shell) return;
+    shell.querySelector<HTMLElement>(`section[data-snap-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  return (
+    <div
+      style={{ backgroundColor: COLOR_BG, color: COLOR_INK, backgroundImage: BACKGROUND_PAPER }}
+      className="relative h-screen overflow-hidden"
+    >
+      {/* Sticky top bar */}
+      <header className="absolute top-0 left-0 right-0 px-5 md:px-14 pt-4 md:pt-6 pb-2.5 md:pb-3 flex items-center justify-between z-50 bg-[#15130F]/75 md:bg-[#15130F]/55 backdrop-blur-md border-b border-ink-faint/15">
+        <button
+          onClick={() => scrollTo('hero')}
+          className="font-display italic-display text-[18px] md:text-[20px] tracking-tight text-ink hover:text-accent transition-colors"
+        >
+          {t(STRINGS.brand)}
+        </button>
+        <nav className="hidden md:flex items-center gap-6">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => scrollTo(s.id)}
+              className={`font-mono text-[11px] uppercase tracking-[0.18em] transition-colors ${
+                SECTIONS[activeIdx]?.id === s.id ? 'text-ink' : 'text-ink-muted hover:text-ink'
+              }`}
+            >
+              {t({ zh: s.labelZh, en: s.labelEn })}
+            </button>
+          ))}
+        </nav>
+        <LangToggle />
+      </header>
+
+      {/* Side dot indicator */}
+      <aside className="absolute right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
+        {SECTIONS.map((s, i) => (
+          <button
+            key={s.id}
+            onClick={() => scrollTo(s.id)}
+            aria-label={`go to ${s.id}`}
+            className="group relative flex items-center justify-end"
+          >
+            <span
+              className={`block rounded-full transition-all ${
+                activeIdx === i
+                  ? 'h-2.5 w-2.5 bg-ink'
+                  : 'h-1.5 w-1.5 bg-ink-faint hover:bg-ink-muted'
+              }`}
+            />
+            <span className="absolute right-5 font-mono text-[10px] uppercase tracking-wider text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {t({ zh: s.labelZh, en: s.labelEn })}
+            </span>
+          </button>
+        ))}
+      </aside>
+
+      <div ref={shellRef} className="snap-shell">
+        <HeroSection />
+        <AboutSection />
+        <PerformanceSection />
+        <RealDataSectionWrapper />
+        <DemosSection />
+        <ArchitectureSection />
+        <ContactSection />
+      </div>
+    </div>
+  );
+}
+
+// ── Section 1: Hero ──────────────────────────────────────────────────────────
+function HeroSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="hero" className="relative flex flex-col items-start justify-center px-6 md:px-14 max-w-7xl mx-auto">
+      {/* Eyebrow brand-line — clean, no demo-tail */}
+      <div className="font-mono text-[11px] sm:text-[12px] uppercase tracking-[0.32em] text-accent mb-6 mt-4 md:mt-16 flex items-center gap-3">
+        <span className="text-ink">{t(STRINGS.heroEyebrow)}</span>
+      </div>
+
+      <h1 className="font-display italic-display text-[40px] sm:text-[52px] md:text-[88px] leading-[1.04] md:leading-[1.0] tracking-[-0.02em] text-ink max-w-5xl">
+        {t(STRINGS.heroBigTitle)}
+      </h1>
+
+      <p className="mt-6 md:mt-8 font-body text-[15px] sm:text-[17px] md:text-[20px] leading-relaxed text-ink-muted max-w-2xl">
+        {t(STRINGS.heroSubBody)}
+      </p>
+
+      <div className="mt-8 md:mt-10 flex flex-wrap gap-3">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded border border-ink/60 text-ink font-body text-[14px] sm:text-[15px] hover:bg-ink hover:text-ground transition-colors"
+        >
+          {t(STRINGS.landing.ctaPrimary)}
+          <ArrowUpRight size={16} strokeWidth={1.5} />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+// ── Section 2: About (产品介绍) ─────────────────────────────────────────────
+function AboutSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="about" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
+      <SectionEyebrow num="01" label={STRINGS.about.eyebrow} />
+      <h2 className="font-display italic-display text-[28px] sm:text-[34px] md:text-[56px] leading-[1.08] text-ink max-w-4xl mb-5 md:mb-6 mt-3">
+        {t(STRINGS.about.title)}
+      </h2>
+      <p className="font-body text-[14px] sm:text-[15px] md:text-[17px] leading-relaxed text-ink-muted max-w-3xl mb-6 md:mb-8">
+        {t(STRINGS.about.p1)}
+      </p>
+      <PillarCarousel />
+    </section>
+  );
+}
+
+// ── Section 3: Performance (取得了什么效果) ────────────────────────────────
+function PerformanceSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="performance" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
+      <div className="flex items-center gap-3 mt-4 md:mt-16 mb-3">
+        <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.24em] sm:tracking-[0.32em] text-accent">
+          § 02 · {t(STRINGS.livePerf.eyebrow)}
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] px-2 py-0.5 rounded bg-gain/15 text-gain border border-gain/40">
+          {t(STRINGS.livePerf.chip)}
+        </span>
+      </div>
+      <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[52px] leading-[1.1] text-ink mb-2">
+        {t(STRINGS.perf.title)}
+      </h2>
+      <p className="font-body italic text-[12px] md:text-[13px] text-ink-faint mb-6 md:mb-10 max-w-3xl">
+        {t(STRINGS.livePerf.chipNote)} · {t(STRINGS.perf.sub)}
+      </p>
+      <HoldingsPanel />
+    </section>
+  );
+}
+
+// ── Section 5: Demos (工作流程) ─────────────────────────────────────────────
+function DemosSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="demos" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-10 md:py-12">
+      <SectionEyebrow num="04" label={STRINGS.demoProcess.eyebrow} />
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-4 mt-3">
+        <h2 className="font-display italic-display text-[26px] sm:text-[30px] md:text-[42px] leading-[1.1] text-ink">
+          {t(STRINGS.demoProcess.title)}
+        </h2>
+        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.demoProcess.sub)}
+        </p>
+      </div>
+      <DemoPreview />
+    </section>
+  );
+}
+
+// ── Section 4: Real results (Agent 实际跑出来的判断) ────────────────────────
+function RealDataSectionWrapper() {
+  const t = useT();
+  return (
+    <section data-snap-id="real" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-16">
+      <SectionEyebrow num="03" label={STRINGS.real.eyebrow} />
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-5 md:mb-6 mt-3">
+        <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[48px] leading-[1.1] text-ink">
+          {t(STRINGS.real.title)}
+        </h2>
+        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.real.sub)}
+        </p>
+      </div>
+      <RealDataSection />
+    </section>
+  );
+}
+
+// ── Section 6: Architecture (系统架构) ─────────────────────────────────────
+function ArchitectureSection() {
+  const t = useT();
+  return (
+    <section data-snap-id="architecture" className="flex flex-col justify-center px-6 md:px-14 max-w-7xl mx-auto py-10 md:py-12">
+      <SectionEyebrow num="05" label={STRINGS.archSection.eyebrow} />
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-4 md:mb-5 mt-3">
+        <h2 className="font-display italic-display text-[28px] sm:text-[32px] md:text-[44px] leading-[1.1] text-ink">
+          {t(STRINGS.arch.title)}
+        </h2>
+        <p className="font-body text-[12px] md:text-[13px] text-ink-muted max-w-md leading-relaxed">
+          {t(STRINGS.arch.sub)}
+        </p>
+      </div>
+
+      {/* Diagram — already self-documents Skill / RAG / Memory / Harness / Arena / Eval / LLM Adapter */}
+      <div className="rounded border border-ink-faint/30 bg-[#1a1612]/40 p-2 md:p-4 mb-4 overflow-x-auto">
+        <div className="min-w-[760px]">
+          <MultiAgentDiagram />
+        </div>
+      </div>
+
+      {/* Compact supported-models strip below the diagram */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint">
+          {t(STRINGS.models.eyebrow)} · arena
+        </span>
+        <ModelLogos variant="inline" size="md" />
+      </div>
+    </section>
+  );
+}
+
+// ── Section 7: Contact ─────────────────────────────────────────────────────
+function ContactSection() {
+  const t = useT();
+  const links = [
+    { icon: Github, label: STRINGS.contact.githubLabel, value: 'github.com/Rain1601', href: 'https://github.com/Rain1601' },
+    { icon: Globe,  label: STRINGS.contact.blogLabel,   value: 'raincraft.dev',       href: 'https://raincraft.dev/' },
+  ];
+  return (
+    <section data-snap-id="contact" className="flex flex-col justify-center px-6 md:px-14 max-w-6xl mx-auto py-12 md:py-20">
+      <SectionEyebrow num="06" label={STRINGS.contactSection.eyebrow} />
+      <h2 className="font-display italic-display text-[26px] sm:text-[30px] md:text-[44px] leading-[1.18] text-ink max-w-3xl mb-3 md:mb-4 mt-3">
+        {t(STRINGS.contact.title)}
+      </h2>
+      <p className="font-body text-[13px] md:text-[15px] leading-relaxed text-ink-muted max-w-2xl mb-6 md:mb-10">
+        {t(STRINGS.contact.sub)}
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-8 md:mb-10">
+        <CopyableEmail email="rain1104@foxmail.com" />
+        {links.map(({ icon: Icon, label, value, href }) => (
+          <a
+            key={value}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded border border-ink-faint/30 bg-[#1a1612]/60 p-5 hover:border-accent/60 hover:bg-[#1f1a16] transition-colors flex items-start gap-4"
+          >
+            <Icon size={22} strokeWidth={1.4} className="text-ink-muted group-hover:text-ink transition-colors mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-faint mb-1">{t(label)}</div>
+              <div className="font-body text-[15px] text-ink truncate">{value}</div>
+            </div>
+            <ArrowUpRight size={14} strokeWidth={1.5} className="text-ink-faint group-hover:text-ink transition-colors mt-1" />
+          </a>
+        ))}
+      </div>
+      <footer className="border-t border-ink-faint/30 pt-5 text-ink-faint font-mono text-[11px] uppercase tracking-[0.18em] flex items-center justify-between flex-wrap gap-2">
+        <span>{t(STRINGS.landing.footer)}</span>
+        <span>uteki.app · {new Date().getFullYear()}</span>
+      </footer>
+    </section>
+  );
+}
+
+// ── Shared ──────────────────────────────────────────────────────────────────
+function SectionEyebrow({ num, label }: { num: string; label: { zh: string; en: string } }) {
+  const t = useT();
+  return (
+    <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.24em] sm:tracking-[0.32em] text-accent mt-4 md:mt-16">
+      § {num} · {t(label)}
+    </div>
+  );
+}
+
+void useI18n;
