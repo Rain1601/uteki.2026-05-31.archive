@@ -246,7 +246,118 @@ LLM 输出能不能被用户信任，是个 0% → 90% 的问题，需要：
 
 ---
 
-## 6. 致谢
+## 6. 第二件大事：我们和 Code Agent 的协作
+
+回头看，这个项目还有一条暗线 —— 它**同时也是一次"如何与 Code Agent 工作"的训练场**。
+
+4 个月里出现过三种协作模式：
+- **创作者（Rain）+ Code Agent** —— 大部分时间这是主线（CLAUDE branch 的 PR、本仓的多次会话）
+- **Code Agent + Code Agent**（异步） —— codex 写完一个 feature 留在 working tree，Claude 后来 review + 拆 commit + 修 bug
+- **Code Agent + Code Agent**（跨仓接力） —— uteki.open 的 Claude 把"M1 todolist"递给 uteki 的 Claude
+
+这一节记录这些模式里**做对的事 / 没做好的事 / 浮现出来的协议**，给未来的 collaborator 团队（无论 human + agent 还是 agent + agent）参考。
+
+### 6.1 关键节点
+
+| 日期 | 节点 | 意义 |
+|---|---|---|
+| 2026-04-17 | 第一个 Claude PR 合入（`004ac99 Merge #1 claude/init-project-t8GSy`） | Claude 第一次作为 `Co-Authored-By` 进入提交历史 |
+| 2026-04-17 | 第二个 Claude PR（`7fe4238 Merge #2 claude/eval-framework`） | 评估框架第一版由 Claude 写出，Rain 审 PR 合入 |
+| 2026-04-23 | `c77739c fix(llm): route all create_unified callers through DB-first resolver` | Rain 修了 Claude 一周前留下的多租户 LLM key 路由问题 —— **agent 工作有 bug，creator 兜底** |
+| 2026-04-30 → 05-01 | Phase 4 多个大重构（Studio/Dossier、Provenance、Editorial Design） | 主要由创作者主导，agent 协作小颗粒度配合 |
+| 2026-05 中旬 | codex 在本地 working tree 完成 macro 解读 feature | **第一个真正的"异步 agent 工作"** —— 提交人是 codex，review 留给后续 |
+| 2026-05-22 | 本次会话开始：Claude review codex 工作 | 发现 `localhostd` typo、`utcnow()` 已废弃、并发 upsert 缺保护 —— **agent-as-reviewer 的价值显现** |
+| 2026-05-22 | 起草 M1 todolist 给 uteki 仓的 Claude | **跨仓 agent 接力**的第一份正式 handoff 文档 |
+
+### 6.2 三种协作模式 · 各自的优势与坑
+
+#### 模式 A · 创作者 + Code Agent（同步协作）
+**形态**：创作者口述目标 → agent 实现 → 创作者 review/redirect → 迭代
+
+**做对的**：
+- **小步快跑 + 频繁 gut check**：创作者用一两句话"对/不对/再想想"作为信号，避免 agent 沿错误方向跑远
+- **明确范围边界**：在请求里说"只动这个文件 / 不要重命名 / 不要顺手修无关的东西" → 减少 scope creep
+- **让 agent 先讲讲再动手**：复杂任务先让 agent 出一个简短计划，看完再说"好，开始"；这一步几乎每次都能避免一次走错方向
+
+**没做好的**：
+- 早期 commit 经常是 agent 一次性提交了**多个不相关的改动**（如 `4f3e4f1` 把 provenance + 一个改动顺手做了），后续难以独立 revert
+- 部分 prompt 里说了"也顺便检查一下 X"导致 agent 把任务范围扩大，超出预算
+- 创作者偶尔不看 diff 就 merge → 后续 14 天内才发现问题（如 LLM key 路由 bug）
+
+#### 模式 B · Code Agent + Code Agent（异步同仓）
+**形态**：agent A 在某个时间写完一个 feature 留在 working tree，agent B 后来打开仓库继续
+
+**实例**：codex 写完了 macro AI 解读功能（11 个修改 + 5 个新文件），过了两周本会话的 Claude 才接手 review
+
+**做对的**：
+- **agent-as-reviewer 找出真 bug**：本次 review 发现 4 件事 codex 自己没注意（typo、deprecated API、并发竞态、限流缺失）—— 不同 agent 关注点不同，互相补位
+- **atomic 拆 commit**：codex 提交时是一坨 working tree，Claude review 后拆成了 6 个 atomic commit（fix typo / dev hygiene / macro feat / detached runs / admin restyle 分开）
+- **保持原作者意图**：commit message 用了"adds X, also Y" 的连接描述，承认 codex 在做这件事时确实做了哪些事，不假装是 Claude 写的
+
+**没做好的**：
+- **没有 review 闸门** —— codex 直接在 working tree 留了 `localhostd` typo，如果创作者 push 这个文件就直接挂了。需要一个"agent 完成→另一个 agent review→creator 合"的流水线
+- **不同 agent 用不同代码约定** —— codex 写了 `datetime.utcnow()`（Python 3.12+ 已 deprecated），Claude 大概率会写 `datetime.now(timezone.utc)`。**代码风格漂移**是异步 agent 协作的隐性税
+- **codex 的 commit attribution**：codex 工作进 working tree 时没标自己，要不是看 prompt 痕迹 / 风格猜测，事后无法可靠归因。Co-Authored-By 应当在 working tree 里也留 marker（README、注释、TODO 都行）
+
+#### 模式 C · Code Agent + Code Agent（跨仓接力）
+**形态**：agent A 在 repo X 完成阶段任务，写一份 handoff 文档给 repo Y 的 agent B
+
+**实例**：本会话尾端的 M1 todolist（`uteki/docs/M1-consistency-and-asof-todolist.md`），uteki.open 的 Claude 把 ConsistencyRunner + `as_of` 的迁移任务递给 uteki 的 Claude
+
+**做对的**：
+- **接收方零上下文假设** —— todolist 自带项目背景（§0）、验收标准（§1）、10 个有序任务（§2）、明确不做的事（§3）、风险点（§4）
+- **指明参考但不要求拷贝** —— "参考 uteki.open 的 `domains/evaluation/service.py:69-250`，但 uteki 用 SQLModel + SQLite，建表语法要改"
+- **优先级排序** —— 标了 P0/P1/P2，让接收方知道哪些数字最该先跑出来
+
+**没做好的**：
+- 这是**第一次正式尝试**，还没经过验证。todolist 写得是否真的"接得住"，要等 uteki 的 Claude 实际跑一遍才知道
+- 没有约定"如果接收方有疑问，怎么回到 sender 这边" —— 当前是 fire-and-forget，未来可能需要异步问答机制
+
+### 6.3 协议化的经验（最有复利的产出）
+
+这些是**值得带到任何 agent 协作项目**的工程协议：
+
+#### CLAUDE.md / AGENTS.md 作为"团队 wiki"
+- CLAUDE.md = 给 Claude 的特定指令（命令、惯例、port 号、踩过的坑）
+- AGENTS.md = 给任何 agent 的仓库级公约（贡献规范、测试方法、commit 风格）
+- 这个项目里 `CLAUDE.md` 第一句就写 "**LOCAL DEV PORT IS 8888** —— 绝对不要用 8000"，每次会话都生效，**5 个月里没出过端口选错的事**
+- 教训：CLAUDE.md 必须**短而锋利** —— 长了就被 agent 当背景噪声忽略
+
+#### Memory 系统（用户级跨会话）
+- 路径 `/Users/rain/.claude/projects/.../memory/MEMORY.md`
+- 记录了"operational autonomy（standing approval to restart backend）"、"default test combo（GOOGL + openai/deepseek-v3.2）"等
+- 跨多日恢复时**让 agent 不必每次问相同的问题**
+- 教训：memory 里的 fact 会过期，agent 在用之前要先 verify（如 "file 还在不在 / function 还存不存在"）。本会话开头我就 verify 了服务还在不在跑
+
+#### Co-Authored-By 提交 trailer
+- Claude 写的代码必须带 `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`
+- 让 `git log --author=Claude` 一键看出 agent 的贡献范围
+- 教训：codex 工作进 working tree 时**没标 marker**，后期归因痛苦
+
+#### Atomic commits + auto-commit 规则
+- CLAUDE.md 后期加了 "Auto + Atomic" 规则：完成一个逻辑单元自动 commit、一个 commit 只装一件事
+- 本次会话尾段把 codex 一坨 working tree 拆成 6 个 atomic commit 就是这个规则的成果
+- 教训：**atomic 是协作的根本**。多个 agent 写一个仓库，commit 不 atomic 就不能独立 review、独立 revert、独立归因
+
+### 6.4 浮现出来的反模式（不要再做）
+
+1. **"顺手"反模式**：agent 做任务 A 时顺手改了 B、C、D。当下没人拦，事后无法 revert 单独的 D。**对策**：creator 和 reviewer 看 diff 时要果断 reject "顺手"
+2. **"重格式化"反模式**：agent 改一行代码顺手 reformat 整个文件（AdminPage 2166 行 mix 进 macro feat 就是例子）。**对策**：格式化必须单独 commit，commit message 直接说 "no functional change"
+3. **"沉默错误"反模式**：agent 跑命令失败，不告诉 creator，自己改个参数重试。**对策**：失败立刻报，让 creator 决定路径
+4. **"过度道歉"反模式**：agent 每次响应里都说"抱歉、是我的疏忽"。**对策**：creator 直接告诉 agent "stop apologizing, just fix"
+
+### 6.5 给未来 Collaborator 团队的 6 条建议
+
+1. **每个 agent 进入项目前读 AGENTS.md + CLAUDE.md** —— 不读就直接拒绝任务（接收方有责任）
+2. **commit 永远 atomic + Co-Authored-By** —— 没例外
+3. **跨仓接力必带 handoff 文档**（M1 todolist 是模板），含背景 / 验收标准 / 任务 / 明确不做的事 / 风险点
+4. **agent-to-agent review 不是可选项**，是必选项。同伴 agent 的关注点和你不一样，能抓到你看不见的 bug
+5. **代码约定要在 AGENTS.md 写死**（如 "all datetimes use `datetime.now(timezone.utc)`, NEVER `datetime.utcnow()`"），不要靠每个 agent 自己的默认
+6. **危险动作前 stop-and-ask**：force-push、删数据、改 schema、重命名公开 API —— agent 默认应该停下来确认
+
+---
+
+## 7. 致谢
 
 - 2026-04-17 起 Claude 作为协作者贡献了多个 PR（评估框架初稿、Admin 重构）
 - 4 个月里大约 218 个 commit，平均每周 ~13 个
