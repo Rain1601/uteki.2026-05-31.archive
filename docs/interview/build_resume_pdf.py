@@ -1,47 +1,61 @@
-"""Render chen_xiaoyu_resume.html → chen_xiaoyu_resume.pdf via WeasyPrint.
+"""Render every chen_xiaoyu_resume*.html → matching .pdf via WeasyPrint.
 
-Requires WeasyPrint with cairo / pango / glib (installed via Homebrew).
+Discovers all `chen_xiaoyu_resume*.html` files in this directory and
+emits a same-named `.pdf` next to each. Lets us keep versions side by
+side (e.g. `chen_xiaoyu_resume.html` as the current, plus snapshots
+`chen_xiaoyu_resume_v3.html`, `chen_xiaoyu_resume_v3-en.html`).
+
+Requires Homebrew pango / cairo / glib (WeasyPrint native deps).
+
 Run:
-    DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib:$DYLD_FALLBACK_LIBRARY_PATH \\
-        python3 build_resume_pdf.py
-
-Or just:
-    ./build_resume_pdf.sh  (wrapper that sets the env)
+    python3 build_resume_pdf.py             # render all
+    python3 build_resume_pdf.py -en         # render only English variants
+    python3 build_resume_pdf.py v3          # render only chen_*_v3*.html
 """
 from pathlib import Path
 import os
 import sys
 
-# Ensure WeasyPrint can find Homebrew's pango/cairo/glib
+# WeasyPrint needs Homebrew's libgobject/cairo on macOS.
 os.environ.setdefault(
     "DYLD_FALLBACK_LIBRARY_PATH",
     "/opt/homebrew/lib:" + os.environ.get("DYLD_FALLBACK_LIBRARY_PATH", ""),
 )
 
 try:
-    import weasyprint  # noqa: E402  (env-setup must come first)
+    import weasyprint  # noqa: E402
 except OSError as e:
     sys.stderr.write(
         "WeasyPrint failed to load native libs.\n"
         f"  {e}\n"
-        "Fix: brew install pango cairo glib && relaunch the shell.\n"
+        "Fix: brew install pango cairo glib && reopen shell.\n"
     )
     sys.exit(1)
 
-
-HERE = Path(__file__).resolve().parent
-SRC = HERE / "chen_xiaoyu_resume.html"
-OUT = HERE / "chen_xiaoyu_resume.pdf"
-
-print(f"Rendering {SRC.name} ...")
-weasyprint.HTML(filename=str(SRC)).write_pdf(str(OUT))
-
-# Quick sanity check: 1-page guarantee
 try:
     from pypdf import PdfReader
-    pages = len(PdfReader(str(OUT)).pages)
-    print(f"OK -> {OUT.name} ({pages} page{'s' if pages != 1 else ''})")
-    if pages != 1:
-        print(f"!! WARNING: expected 1 page, got {pages}", file=sys.stderr)
 except ImportError:
-    print(f"OK -> {OUT.name}")
+    PdfReader = None
+
+
+HERE = Path(__file__).resolve().parent
+PATTERN = "chen_xiaoyu_resume*.html"
+
+filter_substr = sys.argv[1] if len(sys.argv) > 1 else None
+
+candidates = sorted(HERE.glob(PATTERN))
+if filter_substr:
+    candidates = [p for p in candidates if filter_substr in p.stem]
+
+if not candidates:
+    sys.stderr.write(f"No HTML files match {PATTERN}\n")
+    sys.exit(1)
+
+for src in candidates:
+    out = src.with_suffix(".pdf")
+    print(f"Rendering {src.name} -> {out.name}")
+    weasyprint.HTML(filename=str(src)).write_pdf(str(out))
+    if PdfReader is not None:
+        pages = len(PdfReader(str(out)).pages)
+        marker = "✓" if pages == 1 else "!"
+        print(f"  {marker} {pages} page{'s' if pages != 1 else ''}")

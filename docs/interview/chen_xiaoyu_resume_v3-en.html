@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chen Xiaoyu · Résumé</title>
+<style>
+  @page {
+    size: A4;
+    margin: 7mm 10mm;
+  }
+
+  @font-face {
+    font-family: "CN Sans";
+    font-weight: 300 500;
+    src: url("file:///System/Library/Fonts/STHeiti Light.ttc") format("truetype-collection");
+  }
+  @font-face {
+    font-family: "CN Sans";
+    font-weight: 600 900;
+    src: url("file:///System/Library/Fonts/STHeiti Medium.ttc") format("truetype-collection");
+  }
+  @font-face {
+    font-family: "CN Serif";
+    src: url("file:///System/Library/Fonts/Supplemental/Songti.ttc") format("truetype-collection");
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink:    #1a1a1a;
+    --subink: #2e2e2e;
+    --muted:  #6a6a6a;
+    --faint:  #c8c2b6;
+    --accent: #6b3a2e;
+    --paper:  #ffffff;
+  }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Helvetica Neue", -apple-system, "Segoe UI",
+                 "CN Sans", "PingFang SC", sans-serif;
+    font-size: 8pt;
+    line-height: 1.28;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum";
+  }
+  body { padding: 0; }
+
+  strong, b { font-weight: 600; color: var(--ink); }
+  a { color: var(--accent); text-decoration: none; }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(107, 58, 46, 0.06);
+    padding: 0.5px 4px;
+    border-radius: 2px;
+  }
+
+  .name {
+    font-size: 21pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    line-height: 1.05;
+    margin-bottom: 2pt;
+    text-align: center;
+  }
+  .contact {
+    color: var(--muted);
+    font-size: 8.6pt;
+    margin-bottom: 1pt;
+    text-align: center;
+  }
+  .contact a { color: var(--muted); }
+  .contact .sep { padding: 0 6px; color: var(--faint); }
+  .github-handle a { color: var(--accent); font-weight: 500; }
+  .role-title {
+    font-size: 12pt;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-top: 5pt;
+    margin-bottom: 4pt;
+    text-align: center;
+  }
+  .intro {
+    color: var(--subink);
+    text-align: justify;
+    font-size: 7.8pt;
+    line-height: 1.4;
+  }
+  .intro p { margin-bottom: 0pt; }
+
+  .section { margin-top: 1pt; }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1pt;
+  }
+  .section-head .label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .section-head .rule {
+    flex: 1;
+    height: 0.5pt;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+
+  .one-line { font-size: 9.2pt; color: var(--ink); }
+  .one-line .meta { color: var(--muted); }
+
+  .project { margin-top: 1pt; }
+  .project + .project { margin-top: 2pt; }
+  .project-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0.5pt;
+  }
+  .project-name {
+    font-size: 10.2pt;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  .project-link {
+    font-size: 8pt;
+    color: var(--muted);
+    margin-bottom: 1.5pt;
+  }
+  .project-link a { color: var(--accent); }
+  .project-tagline {
+    color: var(--subink);
+    text-align: justify;
+    margin-bottom: 1.5pt;
+    font-size: 7.8pt;
+    line-height: 1.38;
+  }
+
+  .subhead {
+    font-size: 8.3pt;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 1pt;
+    margin-bottom: 0pt;
+  }
+
+  ul { list-style: none; margin: 0; padding: 0; }
+  ul li {
+    position: relative;
+    padding-left: 10pt;
+    margin-bottom: 0.5pt;
+    color: var(--ink);
+    font-size: 7.8pt;
+    line-height: 1.26;
+  }
+  ul li::before {
+    content: "·";
+    position: absolute;
+    left: 2pt;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .chain {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .stat-callout {
+    background: rgba(107, 58, 46, 0.05);
+    border-left: 2pt solid var(--accent);
+    padding: 2pt 7pt;
+    margin-top: 2pt;
+    font-size: 7.8pt;
+    color: var(--ink);
+  }
+
+  .long-term {
+    margin-top: 0;
+    padding: 1.5pt 6pt;
+    border-left: 2pt solid var(--accent);
+    background: rgba(107, 58, 46, 0.03);
+    font-family: Georgia, "Times New Roman", "CN Serif", "Songti SC", serif;
+    font-style: italic;
+    color: var(--subink);
+    font-size: 7.5pt;
+    line-height: 1.3;
+  }
+  .long-term p + p { margin-top: 0.5pt; }
+
+  h2, h3, .project-head { break-after: avoid; page-break-after: avoid; }
+  .project, ul { break-inside: avoid; page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ────────────────────────────────────────────────────────── -->
+<div class="name">Chen Xiaoyu</div>
+<div class="contact">
+  +86 186-0292-0361
+  <span class="sep">|</span>
+  <a href="mailto:rain1104@foxmail.com">rain1104@foxmail.com</a>
+  <span class="sep">|</span>
+  Hangzhou, China
+  <span class="sep">|</span>
+  <span class="github-handle"><a href="https://github.com/Rain1601">github.com/Rain1601</a></span>
+</div>
+
+<div class="role-title">Agent Engineer &nbsp;|&nbsp; Generalist Agents &nbsp;|&nbsp; Investment-Research Agents</div>
+
+<div class="intro">
+  <p>Backend / Agent engineer focused on bringing <b>runnable, observable, evaluable, and iterable</b> Agent systems to production and to complex decision domains.</p>
+  <p>At Alibaba Cloud, led core pipeline development for a real-time voice Agent, cutting <b>end-to-end dialogue latency from 3s+ to 1.5–1.8s</b> while stably serving 100K+ daily calls in a high-concurrency production environment.</p>
+  <p>Outside of work, four years of independent investment-research Agent work — <b>Uteki</b> studies “well-covered” high-quality companies, <b>Shinkai</b> discovers “under-covered” opportunities; both are built around <b>evidence constraint, temporal consistency, structured reasoning, execution trace, and multi-model evaluation</b>, forming a Research → Discovery closed loop.</p>
+</div>
+
+<!-- ─── EDUCATION ─────────────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Education</span><span class="rule"></span></div>
+  <div class="one-line">
+    <b>Xi’an Jiaotong University</b> &nbsp;·&nbsp; Software Engineering
+    <span class="meta">&nbsp;&nbsp;M.S. 2020.09 – 2023.07 (School of Telecommunications) &nbsp;·&nbsp; B.S. 2016.09 – 2020.06 (School of Software)</span>
+  </div>
+</div>
+
+<!-- ─── WORK EXPERIENCE ───────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Work Experience</span><span class="rule"></span></div>
+  <div class="one-line">
+    <b>Alibaba Cloud Intelligence</b> &nbsp;·&nbsp; Backend / Agent Engineer
+    <span class="meta">&nbsp;&nbsp;2023.07 – Present, pivoted to Agent in 2024.10</span>
+  </div>
+</div>
+
+<!-- ─── AGENT PROJECTS ────────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Agent Projects</span><span class="rule"></span></div>
+
+  <!-- ── Voice Agent ─────────────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">Marketing Voice Agent &nbsp;·&nbsp; Alibaba Cloud Digital Marketing Human</span>
+    </div>
+    <div class="project-link">
+      Project: <a href="https://www.aliyun.com/product/thirdsw/aiemployee">aliyun.com/product/thirdsw/aiemployee</a>
+    </div>
+    <div class="project-tagline">
+      Real-time voice Agent for enterprise automated outbound calls, sales conversion, and 7×24 customer interaction. As lead backend developer, drove pipeline construction and iteration of the outbound-call system, focused on <b>low latency, interruptibility, multi-turn consistency, and platform extensibility</b>.
+    </div>
+
+    <div class="subhead">Inference pipeline &amp; latency</div>
+    <ul>
+      <li>End-to-end streaming architecture: <b>ASR → LLM decision (tool calling + RAG) → TTS</b>, reducing wait time and first-packet latency</li>
+      <li>vLLM acceleration + LLM Cache, <b>end-to-end latency 3s+ → 1.5–1.8s</b></li>
+      <li>Dual VAD + dual-path ASR + denoising model (Omni3), systematic handling of barge-in, proper-noun recognition, and noisy environments</li>
+    </ul>
+
+    <div class="subhead">Platform &amp; strategy iteration</div>
+    <ul>
+      <li>Upgraded a single-purpose outbound flow into a <b>configurable Agent platform</b>: compose system prompt + knowledge base + tools + execution policy per business goal; function calling + RAG framework with auto-generated QA pairs from corpora</li>
+      <li>Online debugging + version management + A/B canary, <b>strategy iteration cycle shortened from days to hours</b></li>
+    </ul>
+
+    <div class="stat-callout">
+      <b>Scale:</b> 100K+ daily outbound calls &nbsp;·&nbsp; <b>200 QPM peak</b> (~10K/hr) &nbsp;·&nbsp; <b>200+ stable concurrent calls</b>
+    </div>
+  </div>
+
+  <!-- ── Uteki ───────────────────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">Investment-Research Agent &nbsp;·&nbsp; Uteki</span>
+    </div>
+    <div class="project-link">
+      Project: <a href="https://github.com/Rain1601/uteki.v1.archive">v1</a> &nbsp;|&nbsp; <a href="https://github.com/Rain1601/uteki.v2">v2</a> &nbsp;|&nbsp; <a href="https://github.com/Rain1601/uteki">v3</a>
+    </div>
+    <div class="project-tagline">
+      <b>Investment-research decision infrastructure</b> for <b>S&amp;P 500 / Nasdaq 100</b> high-quality companies — audit-ready, replayable, quantitatively evaluable; produces structured dossiers and decision-evidence chains as trustworthy ground truth for strategy validation.
+    </div>
+
+    <div class="subhead">Core design principles</div>
+    <ul>
+      <li><b>Evidence before conclusion</b> — Agent does not output verdicts directly; it first builds a SourceCatalog unifying financials, market data, news, and search results into DataPoints carrying <i>source, timestamp, confidence</i></li>
+      <li><b>Staged reasoning</b> — decompose company research into a 7-Gate decision chain: <span class="chain">Business Quality → Fisher Growth → Buffett Moat → Munger Management → Inversion Test → Valuation → Synthesis</span></li>
+      <li><b>Constrained autonomy</b> — each gate can call tools, but output must contain structured conclusion + confidence + <code>[src:N]</code> citations; parser validates citation legitimacy, blocking unsourced reasoning</li>
+      <li><b>Temporal consistency</b> — <code>as_of</code> time-window constrains data and source timestamps for honest historical backtesting, <b>strictly preventing lookahead bias</b></li>
+      <li><b>Observability &amp; evaluability</b> — persistent execution trace, gate output, tool calls, citations for replay audit; <b>ConsistencyRunner</b> and <b>Arena</b> measure run-to-run stability</li>
+    </ul>
+
+    <div class="subhead">Engineering</div>
+    <ul>
+      <li>FastAPI + React + Pydantic Agent workbench — SSE streaming / run records / reconnection / replay; Reflection Checkpoint catches cross-gate contradictions; Arena 3-phase (<b>Decide → Vote → Tally</b>) blind multi-LLM peer review</li>
+    </ul>
+  </div>
+
+  <!-- ── Shinkai ─────────────────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">Investment-Research Agent &nbsp;·&nbsp; Shinkai (in progress)</span>
+    </div>
+    <div class="project-link">
+      Project: <a href="https://github.com/Rain1601/shinkai">github.com/Rain1601/shinkai</a>
+    </div>
+    <div class="project-tagline">
+      Active-discovery Agent for under-covered potential opportunities — <span class="chain">discovery → screening → hypothesis → evidence → deep research</span>; complements Uteki to form a <b>Research → Discovery</b> closed loop.
+    </div>
+    <ul>
+      <li><b>Theme-driven supply-chain traversal (Mode B)</b> — given an industry theme (AI compute supply chain first-run completed), traces dependencies layer by layer from leaders (NVIDIA → wafer → optics → cooling), producing ranked candidates per layer</li>
+      <li><b>Hypothesis-first + Research Graph</b> — generate hypothesis, then reverse-search evidence to validate / falsify; persists as a graph consumable by downstream agents (<b>Entity / Claim / Evidence / Question / Thesis</b> node types)</li>
+      <li><b>Multi-persona critique + bounded self-iteration</b> — Planner / Reviewer / Optimizer + L2 critic counter-evidence search; hypothesis state machine drives iteration; hard tool-call budget prevents runaway loops</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── BACKEND PROJECT ───────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Backend Projects</span><span class="rule"></span></div>
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">Apsara Conference Core System &nbsp;·&nbsp; Alibaba Cloud Intelligence</span>
+    </div>
+    <ul>
+      <li><b>Content moderation LLM-ization</b> (early-stage Agent landing in a traditional-business setting): LLM + rule-engine pipeline at <b>8M-file</b> scale, <b>95% auto-coverage, +70% reviewer productivity</b></li>
+      <li>Owned Apsara Conference core system (back-office / ticketing / exhibitor / online summit), supporting <b>87K+ registrations</b>, peak 200 QPM, <b>99.9% availability</b></li>
+      <li>2024 / 2025 Apsara Conference <b>application development &amp; technical PM</b>, coordinating multi-team delivery and change management</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── LONG-TERM DIRECTION ───────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Long-Term Direction</span><span class="rule"></span></div>
+  <div class="long-term">
+    <p>Committed to long-term exploration of applying Agents to real-world complex problems — turning <b>excellent decision-making cognition and experience</b> into continuously evolving systems. My focus is the intersection of AI and investment research: structuring great investors’ thinking frameworks into <b>engineered systems</b>, continuously iterated through Agents.</p>
+  </div>
+</div>
+
+</body>
+</html>
