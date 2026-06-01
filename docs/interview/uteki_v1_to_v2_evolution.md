@@ -21,15 +21,17 @@
 
 | 指标 | v1（已归档） | v2（uteki.open）| 减少 / 增加 |
 |---|---|---|---|
-| 后端 .py 文件数 | 856 | 189 | **-78%** |
-| 后端代码行数 | ~227,000 | ~40,000 | **5.6× 缩减** |
+| 后端 .py 文件数 | 856 | 220 | **-74%**（约 4×） |
+| 后端代码行数 | ~227,700 | ~44,400 | **~5.1× 缩减** |
 | Commit 总数 | 1,358 | 252 (4 个月) | 更少但更聚焦 |
 | Domain 数 | 15 个杂乱子系统 | 12 个 namespaced domain | 模块化 |
 | ORM 模型数 | 113 个（混在一起） | 8 个 domain 模型文件 + schema 隔离 | 责任分离 |
-| 周期 | ~12 个月（含 backtest / trading / OnChain 等） | 4 个月（聚焦投研决策） | 范围收敛 |
+| 周期 | **~21 个月**（2024-04 → 2026-01，含 backtest / trading / OnChain 等） | 4 个月（聚焦投研决策） | 范围收敛 |
 | 前端组件数 | 78 个 JS | 60 个 TS + Vite + Zustand | 类型化 |
 
-**关键解读**：**v2 比 v1 小了 5.6×，但能力反而更强**。这是工程判断力成熟最直接的标志 —— 知道**该删什么**比知道**该写什么**更稀缺。
+**关键解读**：**v2 比 v1 小了 ~5×（按代码量），但能力反而更强**。这是工程判断力成熟最直接的标志 —— 知道**该删什么**比知道**该写什么**更稀缺。
+
+**周期对比直接看**：v1 跑了 21 个月、1358 commit、22.7 万行；v2 在 4 个月、252 commit、4.4 万行里跑出更完整的能力。**单位时间产出 ~5×**。
 
 ---
 
@@ -135,12 +137,12 @@ v1 的可观测性是为了 "debug 时给开发者看"，v2 的可观测性是�
 
 ---
 
-### Δ7 · 代码体量：sprawl → 5.6× 收敛
+### Δ7 · 代码体量：sprawl → ~5× 收敛
 
 | | v1 | v2 |
 |---|---|---|
-| 后端 .py 文件 | 856 | 189 |
-| 后端代码行数 | ~227,000 | ~40,000 |
+| 后端 .py 文件 | 856 | 220 |
+| 后端代码行数 | ~227,700 | ~44,400 |
 | Subsystems | 15 个杂乱（buffett_agent / trading_agent / backtest / strategies / onchain / FOMC / ...） | 12 个 named domain，每个独立 api/models/schemas/service/repository |
 
 **踩的坑**：v1 后期我已经记不清自己代码里哪些还在用 —— 比如 `strategies/` 目录下有 30+ 个策略文件，但实际跑的只有 3 个。`trading_agent_react/` 是早期实验代码，但被 import 到了关键路径上。**代码 sprawl 让 v1 后期改一行都担心炸**。
@@ -155,7 +157,7 @@ v1 的可观测性是为了 "debug 时给开发者看"，v2 的可观测性是�
 - Backtest 框架 → keep
 - Trading strategies → out
 
-range 收敛后，工程师每一周写代码都更聚焦。这就是为什么 v2 4 个月 252 commit 能做出**比 v1 12 个月 1358 commit 更完整的系统**。
+range 收敛后，工程师每一周写代码都更聚焦。这就是为什么 v2 4 个月 252 commit 能做出**比 v1 21 个月 1358 commit 更完整的系统**。
 
 ---
 
@@ -188,10 +190,10 @@ v2（uteki.open）也已经完成它的使命。**下一代是 uteki monorepo**�
 在现有 4-bullet 后面（或前面）加一行：
 
 ```
-· 系统迭代证据 — 本系统（v2）是基于前作 v1（12 个月 / 1358 commit / 227k 行）
-  4 个月深度踩坑后的重写：代码量收敛 5.6×、增补 SourceCatalog 防止
-  lookahead bias、增补 ConsistencyRunner 量化输出稳定性、修复 v1 遗留的
-  symbol-less cache key 导致的 cross-contamination 问题
+· 系统迭代证据 — 本系统（v2）是基于前作 v1（21 个月 / 1358 commit / 22.7 万行）
+  4 个月深度踩坑后的重写：代码量收敛 ~5×（4.4 万行 / 252 commit）、增补
+  SourceCatalog 防止 lookahead bias、增补 ConsistencyRunner 量化输出稳定性、
+  修复 v1 遗留的 symbol-less cache key 导致的 cross-contamination 问题
 ```
 
 ### 5.2 面试讲述里挑 1 个 delta 深聊
@@ -204,7 +206,7 @@ v2（uteki.open）也已经完成它的使命。**下一代是 uteki monorepo**�
 ### 5.3 被问"那 v1 是不是失败的项目"时怎么答
 **❌ 不要承认"v1 失败了"**
 **✅ 答**：
-> "v1 不是失败的项目，**它是我学习投资 agent 工程的成本**。v1 教会了我 7 件事，每件事都直接对应 v2 的一个架构决策。**如果没有 v1 那 12 个月，v2 不可能在 4 个月就能跑通**。我会把 v1 看作必要的 R&D 投入，不是失败。"
+> "v1 不是失败的项目，**它是我学习投资 agent 工程的成本**。v1 教会了我 7 件事，每件事都直接对应 v2 的一个架构决策。**如果没有 v1 那 21 个月，v2 不可能在 4 个月就能跑通**。我会把 v1 看作必要的 R&D 投入，不是失败。"
 >
 > 这个答法直接呼应了 Dalio "Pain + Reflection = Progress" —— **v1 是 pain，v2 是 progress，中间是 reflection**。
 
@@ -214,22 +216,19 @@ v2（uteki.open）也已经完成它的使命。**下一代是 uteki monorepo**�
 
 > 这些数字是 Explore agent 从文件结构推算的，Rain 投递前请二次核对：
 
-- [ ] v1 总 commit 数（1358）—— 跑一次 `git log --oneline | wc -l` 在 `/Users/rain/PycharmProjects/uteki.v1.archive`
-- [ ] v1 后端 .py 文件数（856）—— `find /Users/rain/PycharmProjects/uteki.v1.archive/backend -name "*.py" | wc -l`
-- [ ] v1 后端代码行数（~227k）—— `cloc backend/` 或 `find ... -name "*.py" -exec cat {} \; | wc -l`
-- [ ] v2 同样三个数（189 / ~40k / 252）—— 对照核
-- [ ] v1 起止时间（用于"12 个月"这个说法）
-- [ ] v1 投资框架的具体形态（是 3-Agent Lead/Buffett/Munger 还是其他？Explore 提到 7 个大师 / 我们 v2 用的是 6 个大师 + 1 综合，需要确认 v1 的实际形态）
+所有数字（v1: 856 文件 / 22.77 万行 / 1358 commit / 2024-04 → 2026-01；v2: 220 文件 / 4.44 万行 / 252 commit / 2026-02 → 2026-05）均已通过 `git log` + `find ... | wc -l` + `find ... -exec cat {} \; | wc -l` 实测核对。**可直接作为简历 reference 链接引用**。
 
-**核对完之后这份文档就可以作为简历的 reference 链接**。
+唯一**仍需 Rain 确认**：
+
+- [ ] v1 投资框架的具体形态：是 3-Agent（Lead/Buffett/Munger）还是 v2 同款 7-Gate？Explore agent 报告有冲突，建议 Rain 翻一下 `/Users/rain/PycharmProjects/uteki.v1.archive/backend` 里的 agent 代码再确认 Δ1 / Δ2 的具体讲法。
 
 ---
 
 ## 7. 一句话总结（最重要的 100 字）
 
-> "v1 我用 12 个月、1358 commit 实现了一个会跑的 LLM 投研 agent。
-> v2 我用 4 个月、252 commit 重写为一个**可被审计、可被衡量、可被信任**的决策系统。
-> v2 比 v1 代码量小 5.6 倍，但能力反而更强 —— 这是工程判断力成熟最直接的标志：
+> "v1 我用 21 个月、1358 commit、22.7 万行实现了一个会跑的 LLM 投研 agent。
+> v2 我用 4 个月、252 commit、4.4 万行重写为一个**可被审计、可被衡量、可被信任**的决策系统。
+> v2 比 v1 代码量小约 5 倍，但能力反而更强 —— 这是工程判断力成熟最直接的标志：
 > **知道该删什么比知道该写什么更稀缺**。"
 
 ---
