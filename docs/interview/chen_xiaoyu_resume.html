@@ -100,7 +100,7 @@
 
   /* ─── Section dividers ─────────────────────────────────────────────── */
   .section {
-    margin-top: 3pt;
+    margin-top: 2pt;
   }
   .section-head {
     display: flex;
@@ -215,16 +215,16 @@
 
   /* ─── Long-term direction (Songti quote) ───────────────────────────── */
   .long-term {
-    margin-top: 2pt;
-    padding: 4pt 9pt;
+    margin-top: 1pt;
+    padding: 3pt 8pt;
     border-left: 2pt solid var(--accent);
     background: rgba(107, 58, 46, 0.03);
     font-family: "CN Serif", "Songti SC", "STSong", Georgia, serif;
     color: var(--subink);
-    font-size: 8.3pt;
-    line-height: 1.45;
+    font-size: 8.2pt;
+    line-height: 1.4;
   }
-  .long-term p + p { margin-top: 1.5pt; }
+  .long-term p + p { margin-top: 1pt; }
 
   /* ─── Disable orphans ──────────────────────────────────────────────── */
   h2, h3, .project-head { break-after: avoid; page-break-after: avoid; }
@@ -324,7 +324,7 @@
       <a href="https://github.com/Rain1601/uteki">v3</a>
     </div>
     <div class="project-tagline">
-      面向 <b>标普 500 / Nasdaq 100</b> 中“清晰可见”的高质量公司，构建<b>可审计、可回放、可评估</b>的投研 Agent。
+      面向 <b>标普 500 / Nasdaq 100</b> 高质量公司构建<b>可审计、可回放、可评估</b>的<b>投研决策基础设施</b> —— 输出结构化 dossier 与决策证据链，为策略实证提供可信 ground truth。
     </div>
 
     <div class="subhead">核心设计原则</div>
@@ -338,10 +338,7 @@
 
     <div class="subhead">工程实现</div>
     <ul>
-      <li>FastAPI + React 构建完整 Agent 工作台，支持 SSE 流式执行、运行记录、断线恢复、结果回放</li>
-      <li>Pydantic 约束每个 Gate 的结构化输出，降低自由文本不可控问题</li>
-      <li>Reflection Checkpoint 检测跨 Gate 矛盾，并将上游结论作为下游推理上下文</li>
-      <li>Arena 3-phase（<b>Decide → Vote → Tally</b>），多 LLM 独立判断 + 匿名互评，提高结论稳定性</li>
+      <li>FastAPI + React + Pydantic 构建完整工作台 —— SSE 流式执行 / 运行记录 / 断线恢复 / 结果回放；Reflection Checkpoint 跨 Gate 矛盾检测；Arena 3-phase（<b>Decide → Vote → Tally</b>）多 LLM 匿名互评</li>
     </ul>
   </div>
 
@@ -354,13 +351,12 @@
       项目链接：<a href="https://github.com/Rain1601/shinkai">github.com/Rain1601/shinkai</a>
     </div>
     <div class="project-tagline">
-      面向“市场尚未充分覆盖”的潜在优质公司，探索从 <b>公司发现 → 初筛 → 假设生成 → 深度研究</b> 的主动式投研 Agent。
+      面向“市场尚未充分覆盖”的潜在优质公司，探索 <span class="chain">公司发现 → 初筛 → 假设生成 → 证据验证 → 深度研究</span> 的主动式投研 Agent；与 Uteki 互补，构成 <b>Research → Discovery</b> 完整闭环。
     </div>
     <ul>
-      <li><b>与 Uteki 的差异</b>：Uteki 偏深度审计已知公司，Shinkai 偏<b>主动发现未知机会</b> —— 共同构成 Research → Discovery 完整闭环</li>
-      <li><b>候选池发现流程</b>：从财务质量、增长异常、估值错配、行业变化和市场忽视信号中生成研究对象</li>
-      <li><b>Hypothesis-first 研究链路</b>：先生成投资假设，再反向搜索证据验证或证伪，避免只做信息汇总</li>
-      <li>目标形成 <span class="chain">发现 → 假设 → 证据 → 反证 → 深度研究</span> 端到端投研 Agent 流程</li>
+      <li><b>主题驱动的供应链追溯（Mode B）</b>：给定产业主题（已实现 AI 算力供应链首跑），系统从龙头逐层追溯依赖（NVIDIA → 晶圆 → 光学 → 散热），每层产出 candidate 与排序</li>
+      <li><b>Hypothesis-first + Research Graph</b>：先假设后反向搜索证据验证 / 证伪，持久化为下游可消费的图结构（Entity / Claim / Evidence / Question / Thesis 五类节点）</li>
+      <li><b>多角色批判 + 有界自迭代</b>：Planner / Reviewer / Optimizer + L2 critic 反证搜索；hypothesis state machine 驱动迭代，tool-call 预算硬约束防失控</li>
     </ul>
   </div>
 </div>
@@ -373,10 +369,9 @@
       <span class="project-name">云栖大会核心系统 · 阿里云智能</span>
     </div>
     <ul>
-      <li>主导核心运营后台、票证、展商、云上峰会等多模块开发与稳定性建设</li>
-      <li>2024 / 2025 年云栖大会<b>应用开发与技术 PM</b>，协调多团队推进需求交付与变更管理</li>
-      <li>支撑累计 <b>8.7 万+ 用户报名</b>与参会，峰值 200 QPM，<b>系统可用性 99.9%</b></li>
-      <li>主导内容审核系统智能化升级，处理 <b>800 万文件</b>，自动化覆盖 95%，<b>审核人效 +70%</b></li>
+      <li><b>内容审核 LLM 化</b>（Agent 在传统业务侧的早期落地）：800 万文件规模下落地 LLM + 规则引擎协同管线，<b>自动化覆盖 95%、审核人效 +70%</b></li>
+      <li>主导云栖大会核心系统（运营后台 / 票证 / 展商 / 云上峰会），<b>8.7 万+ 用户报名</b>、峰值 200 QPM、<b>可用性 99.9%</b></li>
+      <li>2024 / 2025 年云栖大会<b>应用开发与技术 PM</b>，协调多团队推进需求与变更管理</li>
     </ul>
   </div>
 </div>
@@ -385,8 +380,7 @@
 <div class="section">
   <div class="section-head"><span class="label">长期方向</span><span class="rule"></span></div>
   <div class="long-term">
-    <p>我致力于长期探索应用 Agent 解决现实世界的复杂问题，将<b>优秀决策认知与经验</b>转化为可持续演化的系统。</p>
-    <p>在未来，长期聚焦于 AI 与投资研究的结合，将优秀投资的思考框架<b>结构化、工程化</b>，并通过 Agent 持续验证、优化与迭代决策质量。</p>
+    <p>我相信<b>优秀的投资决策可以被结构化、工程化、可持续迭代</b> —— 决策可信度是工程问题。下一阶段在 Uteki + Shinkai 这套基础设施上完成多年回测与实证，把方法论沉淀为可在垂直行业（AI 算力 / 半导体 / 生物医药）反复使用的<b>投研 Agent 框架</b>。</p>
   </div>
 </div>
 
