@@ -19,11 +19,12 @@
 
 ## 1. 简历内容（终稿，直接复制）
 
-### 1.1 项目段落 · 通用基金版（10 行整）
+### 1.1 项目段落 · 通用基金版（终稿，含 v1→v2 迭代证据）
 
 ```
-雨滴 · Uteki — 系统化 LLM 投研决策框架（个人项目）
-2025.05 - 至今 | 单人主导，4 个月 218 commit | Python · FastAPI · PostgreSQL
+雨滴 · Uteki — 系统化 LLM 投研决策框架（个人项目，v2）
+2026.02 - 2026.05 | 单人主导，4 个月 252 commit / 4.4 万行 | 
+Python · FastAPI · PostgreSQL
 
 将 Fisher 15 问 / Buffett 护城河 / Munger 反向测试这套经典价值投资框架，
 编码成可重复、可审计、可量化稳定性的 LLM 决策 pipeline，覆盖美 / 港 / A 股。
@@ -36,9 +37,13 @@
   跨模型决策一致性；ConsistencyRunner 跑 N 次同输入测内在 CV
 · 完整 execution trace 持久化（DecisionHarness + ModelIO 模型），任何决策可
   逐步 replay 与归因审计
+· 系统迭代证据 — 本系统（v2）是基于前作 v1（21 个月 / 1358 commit / 22.7 万行）
+  4 个月深度踩坑后的重写：代码量收敛 ~5×、增补 SourceCatalog 防 lookahead bias、
+  增补 ConsistencyRunner 量化稳定性、修复 v1 遗留的 symbol-less cache 
+  cross-contamination 问题；详见附件 docs/interview/uteki_v1_to_v2_evolution.md
 ```
 
-**字数控制**：上面正好 ~10 行，简历一栏排版能 fit 进去。
+**字数控制**：上面正好 ~13 行（加了第 5 个 evolution bullet）。如果简历一栏放不下，删第 3 或第 4 bullet 保留 evolution 那条 —— **v1→v2 迭代证据是最难复制、最有信号的一条**。
 
 ### 1.2 投递时的微调清单
 
@@ -72,11 +77,13 @@ Investment Domain Knowledge (Fisher / Buffett / Munger frameworks)
 
 ```
 [姓名 + 联系方式]
+项目附件：https://github.com/Rain1601/uteki.v2/blob/main/docs/interview/
+                    uteki_v1_to_v2_evolution.md  ← 加在 header 下面
 
 【教育背景】（紧凑 2 行）
 
 【主要项目】← 把 Uteki 放这里，不放在工作经历下面
-   §1.1 的 10 行段落
+   §1.1 的 13 行段落（含 v1→v2 evolution bullet）
 
 【工作 / 实习经历】（按时间倒序）
 
@@ -86,7 +93,20 @@ Investment Domain Knowledge (Fisher / Buffett / Munger frameworks)
 **关键判断**：把 Uteki **放在工作经历前面**（"主要项目"独立板块），因为：
 - Uteki 是你最强的差异化资产
 - 工程岗 + 个人项目大于 SaaS 工作经历的认知是 fund hiring 常见
-- 4 个月单人 218 commit 的完成度本身就是信号
+- 4 个月单人 252 commit 的完成度本身就是信号
+- **v1→v2 迭代证据**是无法被造假的工程判断力信号
+
+### 1.5 附件链接（加在简历 header）
+
+```
+项目深度阅读：
+- v1 → v2 工程迭代证据（5 倍代码收敛 + 增补 provenance/eval）
+  https://github.com/Rain1601/uteki.v2/blob/main/docs/interview/uteki_v1_to_v2_evolution.md
+```
+
+**为什么单列**：感兴趣的面试官会在面试前 10 分钟点开看。这份 doc **自己会说话** —— 它呈现的"我能复盘 + 我能重写 + 我有数据证据" 比简历段落里 4 行 bullet 强 10 倍。
+
+**也可以放成 QR 码**（如果是打印版简历）—— 高级且不打断简历版面。
 
 ---
 
@@ -104,17 +124,19 @@ Investment Domain Knowledge (Fisher / Buffett / Munger frameworks)
 
 ---
 
-### 2.2 60 秒版（**默认主版本，最常用**）
+### 2.2 60 秒版（**默认主版本，最常用** · 含 v1→v2 叙事）
 
-> 我叫 Rain。我是工程背景，过去 [N] 年主要做 [BACKGROUND_SUMMARY]。但我和大多数面 buyside 工程岗的候选人不太一样 —— **我自己投资了 [N] 年，并且把这件事做成了一个完整的系统**。
+> 我是 Rain，工程背景。我和很多面 buyside 工程岗的候选人不一样的地方是 —— **我做过两版完整的投资决策系统**。
 >
-> 这个系统叫 Uteki，是我过去 4 个月单人主导的个人项目，218 个 commit。**核心做的事是 —— 把 Fisher、Buffett、Munger 这套经典价值投资框架 codify 成一个 7 步的 LLM 决策 pipeline**，每一步输出结构化 JSON，下游必须基于上游的引用源推理。整个系统覆盖美股、港股、A 股。
+> 第一版（v1）我跑了 21 个月、1358 个 commit、22.7 万行代码 —— 用一堆 LLM agent 实现了能跑的投研系统。但跑完我自己复盘 —— **缓存会污染、回测在作弊、prompt 改了没有评估**。
 >
-> 但**真正花我心思的不是 agent 本身，是回测可信度** —— 我做了一套 `as_of` 时间窗 + provenance + 引用强制机制，确保历史回测严格无未来信息泄漏，所有决策事件流持久化可逐步 replay 审计。**这些东西对 C 端用户是 nice-to-have，但我后来发现对 fund 来说是必需品**。
+> 第二版（v2）是过去 4 个月、252 commit、4.4 万行重写。**v2 比 v1 代码量小 5 倍，但能力更强** —— 因为我学会了：先建评估再写 agent、数据层强制 `as_of` 防 lookahead bias、用 SourceCatalog 让每个论断可被审计。这套系统的核心是把 Fisher / Buffett / Munger 的投资框架 codify 成 7-Gate 的决策 pipeline。
 >
-> 我对 [桥水 / 千象] 的兴趣是 [SPECIFIC_REASON]。我希望接下来能 [WHAT_YOU_WANT]。
+> 我对 [桥水 / 千象] 感兴趣的根本原因是 —— 我做这两版项目学到的最大一件事是"**Agent 工程不是 prompt engineering，是 decision credibility engineering**"。这正是你们做的事。
 
 **用法**：60 秒标准开场，最常用。**这是必背版本**。
+
+**为什么这版强**：把"会跑 → 会反思 → 会重写"完整呈现，这正是 Dalio "Pain + Reflection = Progress" 的活范例。基金面试官 60 秒里听到这个叙事会立刻坐直。
 
 ---
 
@@ -201,6 +223,13 @@ Investment Domain Knowledge (Fisher / Buffett / Munger frameworks)
 #### A10 · "这套架构能扩展到 multi-strategy ensemble 吗？"
 > 能。Arena 投票机制本质就是 ensemble consensus —— 当前是 N 个 LLM 投同一个标的，可以推广到 N 个 alpha signal 投同一个仓位决策。SourceCatalog 已经支持 4 类数据源，可以加因子源；DecisionHarness 的 schema 设计是 strategy-agnostic 的。
 
+#### A11 · "你为什么从 v1 重写成 v2？v1 是失败的吗？" ⭐ 高频
+> **v1 不是失败的项目，它是我学习投资 agent 工程的成本**。v1 我跑了 21 个月、1358 commit、22.7 万行代码，做出了一个能跑的 LLM 投研系统。但跑完我发现 3 个根本问题：**缓存会污染**（不同股票共享 cache，TSLA 返回 MSFT 数据）、**回测在作弊**（yfinance 实时接口偷偷喂未来数据）、**prompt 改了没有评估**（凭感觉调优）。
+>
+> v2 是 4 个月、252 commit、4.4 万行重写。**v2 比 v1 代码量小 ~5 倍但能力更强** —— 因为我学会了 3 件事：① 先建评估再写 agent，② 数据层强制 `as_of` 防 lookahead bias，③ 用 SourceCatalog 让每个论断可被审计。
+>
+> **如果没有 v1 那 21 个月的痛，v2 不可能在 4 个月就能跑通**。这两版的关系不是"失败 → 成功"，是 Dalio 说的 **Pain + Reflection = Progress** 的活范例。详细对比可以看附件 docs/interview/uteki_v1_to_v2_evolution.md。
+
 ---
 
 ### B. 投资 / 业务认知（5 题）
@@ -231,8 +260,17 @@ Investment Domain Knowledge (Fisher / Buffett / Munger frameworks)
 
 > **桥水的行为题特别注重"radical transparency"和"acknowledging mistakes"**。准备这类题的核心是 —— 不要美化，不要回避，讲真实的失败和反思。
 
-#### C1 · "你最近一次承认自己错了的经历？"
-> 准备 1 个**具体的**故事。要素：① 错在哪（具体决策），② 怎么发现的（数据 / 别人指出 / 自己复盘），③ 修正过程（不是简单说 sorry，是怎么改的），④ 制度化（后续怎么防止再犯）。**uteki 项目有现成的素材** —— 比如 TSLA → MSFT 缓存污染 bug 故事（详见 pitch doc）。
+#### C1 · "你最近一次承认自己错了的经历？" ⭐ 桥水高频
+> 准备 1 个**具体的**故事。要素：① 错在哪（具体决策），② 怎么发现的（数据 / 别人指出 / 自己复盘），③ 修正过程（不是简单说 sorry，是怎么改的），④ 制度化（后续怎么防止再犯）。
+>
+> **最强答案 = v1 → v2 重写故事**。
+> 「我做 Uteki 第一版（v1）跑了 21 个月、22.7 万行代码。跑完我自己复盘 —— 发现 3 件事我做错了：第一，缓存 key 没包含 symbol，曾经返回过 TSLA 但内容是 MSFT 的数据，bug 在 production 跑了 3 天才被发现，因为 LLM 输出"看起来合理"；第二，我用 yfinance 实时接口跑历史回测，**自己作弊不自知**；第三，我改 prompt 凭感觉，没建评估。
+>
+> 这 3 件事都不是技术疏忽，是**架构判断错了**。所以我用 4 个月把 v2 整个重写 —— 代码量小 5 倍但加了 SourceCatalog 防 lookahead bias、ConsistencyRunner 量化稳定性、symbol-aware cache key。**承认 v1 错了是为了让 v2 做对**」。
+>
+> **为什么这答法强**：① 具体故事，② 自己发现的（不是别人指出），③ 制度化（重写）+ 数字（5×），④ 直接呼应桥水 "pain + reflection = progress"。比"我那次代码 review 没看仔细"强 100 倍。
+>
+> 备选素材：TSLA → MSFT cache bug 单独成故事（详见 pitch doc）。
 
 #### C2 · "你怎么处理同事 / 老板对你的批评？"
 > **不要说**"我会虚心接受" —— 太空。
