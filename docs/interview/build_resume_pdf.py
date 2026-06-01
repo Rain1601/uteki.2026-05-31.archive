@@ -1,68 +1,74 @@
-"""Build Chen Xiaoyu's 1-page resume PDF.
+"""Build Chen Xiaoyu's 1-page resume PDF (final content).
 
-Editorial typography: Hiragino Sans GB for body, STHeiti Medium for headers,
-Songti SC for serif accents (taglines + philosophy quotes).
+Editorial typography:
+- STHeiti Light for body, STHeiti Medium for bold/headers
+- Songti SC for serif pull-quotes
+- Warm-dark accent palette
+- Tight A4 layout for single-page constraint
+
+Run: python3 build_resume_pdf.py
 """
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm, mm
+from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, HRFlowable, KeepTogether,
-    Table, TableStyle,
+    SimpleDocTemplate, Paragraph, Spacer, HRFlowable,
 )
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
+from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY
 from reportlab.lib.colors import HexColor
 
 # ── Fonts ──────────────────────────────────────────────────────────────
-# STHeiti Light/Medium are TrueType (Hiragino is PostScript-CFF, unsupported by reportlab)
 pdfmetrics.registerFont(TTFont("Hira", "/System/Library/Fonts/STHeiti Light.ttc", subfontIndex=0))
 pdfmetrics.registerFont(TTFont("HiraBold", "/System/Library/Fonts/STHeiti Medium.ttc", subfontIndex=0))
 pdfmetrics.registerFont(TTFont("Heiti", "/System/Library/Fonts/STHeiti Medium.ttc", subfontIndex=0))
 pdfmetrics.registerFont(TTFont("Songti", "/System/Library/Fonts/Supplemental/Songti.ttc", subfontIndex=0))
 
-# ── Colors ─────────────────────────────────────────────────────────────
+# ── Colors (warm-dark editorial palette) ───────────────────────────────
 INK = HexColor("#1a1a1a")
-ACCENT = HexColor("#6b3a2e")     # warm dark — for the role title + section accents
-SUBINK = HexColor("#3a3a3a")
+SUBINK = HexColor("#333333")
+ACCENT = HexColor("#6b3a2e")       # warm dark — section accents
 MUTED = HexColor("#6a6a6a")
-FAINT = HexColor("#cfcfcf")
-PAPER = HexColor("#fefdf8")       # warm white
+FAINT = HexColor("#d4cfc6")
 
 # ── Styles ─────────────────────────────────────────────────────────────
-def st(name, font="Hira", size=9, leading=12.5, color=INK, **kw):
+def st(name, font="Hira", size=8.5, leading=11, color=INK, **kw):
     return ParagraphStyle(name, fontName=font, fontSize=size, leading=leading, textColor=color, **kw)
 
-s_name = st("Name", font="Heiti", size=22, leading=26, color=INK)
-s_contact = st("Contact", font="Hira", size=8.5, leading=11, color=MUTED)
-s_title = st("Title", font="HiraBold", size=13, leading=17, color=ACCENT, spaceBefore=2)
-s_intro = st("Intro", font="Hira", size=9, leading=13, color=SUBINK, alignment=TA_JUSTIFY)
+s_name      = st("Name", font="Heiti", size=20, leading=24, color=INK)
+s_contact   = st("Contact", font="Hira", size=8, leading=10.5, color=MUTED)
+s_title     = st("Title", font="HiraBold", size=11.5, leading=15, color=ACCENT, spaceBefore=2, spaceAfter=2)
+s_intro     = st("Intro", font="Hira", size=8.5, leading=11.5, color=SUBINK, alignment=TA_JUSTIFY)
 
-s_section = st("Section", font="HiraBold", size=10.5, leading=14, color=ACCENT, spaceBefore=4, spaceAfter=2)
+s_section   = st("Section", font="HiraBold", size=9.8, leading=12.5, color=ACCENT,
+                 spaceBefore=2, spaceAfter=1)
 
-s_role = st("Role", font="HiraBold", size=10, leading=13, color=INK)
-s_role_meta = st("RoleMeta", font="Hira", size=8.5, leading=11, color=MUTED)
-s_role_intro = st("RoleIntro", font="Hira", size=9, leading=12, color=SUBINK)
+s_body      = st("Body", font="Hira", size=8.3, leading=11, color=INK)
 
-s_subhead = st("Subhead", font="HiraBold", size=9.5, leading=12.5, color=INK, spaceBefore=3, spaceAfter=1)
-s_body = st("Body", font="Hira", size=9, leading=12.5, color=INK)
-s_bullet = st("Bullet", font="Hira", size=9, leading=12.5, color=INK, leftIndent=10, bulletIndent=0)
+s_proj_head = st("ProjHead", font="HiraBold", size=9.8, leading=12.5, color=INK, spaceBefore=3, spaceAfter=0)
+s_proj_meta = st("ProjMeta", font="Hira", size=7.6, leading=9.5, color=MUTED)
+s_proj_desc = st("ProjDesc", font="Hira", size=8.3, leading=11, color=SUBINK,
+                 alignment=TA_JUSTIFY, spaceBefore=1, spaceAfter=1)
 
-s_quote = st("Quote", font="Songti", size=9.5, leading=14, color=ACCENT, leftIndent=14, rightIndent=6, spaceBefore=1, spaceAfter=1)
+s_subhead   = st("Subhead", font="HiraBold", size=8.6, leading=11, color=INK, spaceBefore=1, spaceAfter=0)
+s_bullet    = st("Bullet", font="Hira", size=8.3, leading=11, color=INK,
+                 leftIndent=10, bulletIndent=0, spaceAfter=0)
 
-s_stat = st("Stat", font="Hira", size=9, leading=12, color=INK)
+s_quote     = st("Quote", font="Songti", size=8.8, leading=12.5, color=SUBINK,
+                 leftIndent=12, rightIndent=4, spaceBefore=1, spaceAfter=1, alignment=TA_LEFT)
 
-# ── Doc ────────────────────────────────────────────────────────────────
+
+# ── Document ───────────────────────────────────────────────────────────
 out_path = "/Users/rain/PycharmProjects/uteki.open/docs/interview/chen_xiaoyu_resume.pdf"
 
 doc = SimpleDocTemplate(
     out_path,
     pagesize=A4,
-    leftMargin=1.6*cm,
-    rightMargin=1.6*cm,
-    topMargin=1.2*cm,
-    bottomMargin=1.2*cm,
+    leftMargin=1.2*cm,
+    rightMargin=1.2*cm,
+    topMargin=0.8*cm,
+    bottomMargin=0.8*cm,
     title="陈小宇 简历",
     author="陈小宇",
 )
@@ -70,192 +76,177 @@ doc = SimpleDocTemplate(
 story = []
 
 
-def hr(thickness=0.4, color=FAINT, before=2, after=4):
-    return HRFlowable(width="100%", thickness=thickness, color=color,
-                      spaceBefore=before, spaceAfter=after)
-
-
 def section_header(text):
-    """Editorial accent-line + bold caption."""
     return [
-        HRFlowable(width="100%", thickness=0.6, color=ACCENT, spaceBefore=6, spaceAfter=2),
+        HRFlowable(width="100%", thickness=0.5, color=ACCENT, spaceBefore=3, spaceAfter=1),
         Paragraph(text, s_section),
     ]
 
 
-# ── HEADER ─────────────────────────────────────────────────────────────
+def bullet(text):
+    return Paragraph(f"·&nbsp;&nbsp;{text}", s_bullet)
+
+
+# ─────────────────────────────────────────────────────────────────────
+# HEADER
+# ─────────────────────────────────────────────────────────────────────
 story.append(Paragraph("陈小宇", s_name))
 story.append(Paragraph(
-    "📞 186-0292-0361 &nbsp;｜&nbsp; ✉️ rain1104@foxmail.com &nbsp;｜&nbsp; 📍 杭州",
-    s_contact))
-story.append(Paragraph("AI 投资决策系统工程师", s_title))
-story.append(Spacer(1, 3))
+    "186-0292-0361 &nbsp;｜&nbsp; rain1104@foxmail.com &nbsp;｜&nbsp; 杭州 &nbsp;｜&nbsp; "
+    "<font color='#6b3a2e'>github.com/Rain1601</font>",
+    s_contact,
+))
+story.append(Paragraph("Agent 开发工程师 ｜ 通用 Agent 系统 ｜ 投研 Agent", s_title))
 story.append(Paragraph(
-    "<b>3 年+ 后端开发经验，2 年+ AI 系统研发经验。</b>"
-    "专注于将投资研究方法与决策原则转化为可执行、可审计、可量化评估的智能决策系统；"
-    "具备从系统架构设计、推理流程构建、可靠性评估到生产环境落地的完整经验。",
-    s_intro))
-story.append(Spacer(1, 1.5))
-story.append(Paragraph(
-    "独立设计并开发投研系统 <b>Uteki</b>，探索大模型在投资决策场景中的可靠性、一致性、"
-    "可解释性与偏差控制；同时在阿里云负责实时 AI 决策系统研发与性能优化，"
-    "支撑高并发生产环境稳定运行。",
-    s_intro))
+    "后端 / Agent 工程师，关注<b>可运行、可观察、可评估、可迭代</b>的 Agent 系统。"
+    "在阿里云参与并主导实时语音 Agent 核心链路建设，支撑高并发生产环境，"
+    "将<b>端到端对话延迟从 3s+ 优化至 1.5–1.8s</b>。"
+    "独立设计并实现投研 Agent <b>Uteki</b>，围绕<b>证据约束、时间一致性、结构化推理、execution trace 和多模型评估</b>，"
+    "探索 Agent 在复杂投研决策中的工程化落地。",
+    s_intro,
+))
 
-# ── EDUCATION ──────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# EDUCATION
+# ─────────────────────────────────────────────────────────────────────
 story += section_header("教育经历")
 story.append(Paragraph(
-    "<b>西安交通大学</b>　软件工程　　"
-    "<font color='#3a3a3a'>硕士 2020.09 – 2023.07　·　学士 2016.09 – 2020.06</font>",
-    s_body))
+    "<b>西安交通大学</b>　·　软件工程　　"
+    "<font color='#6a6a6a'>硕士 2020.09 – 2023.07（电信学部）　·　学士 2016.09 – 2020.06（软件学院）</font>",
+    s_body,
+))
 
-# ── WORK EXPERIENCE ────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────
+# WORK EXPERIENCE
+# ─────────────────────────────────────────────────────────────────────
 story += section_header("工作经历")
 story.append(Paragraph(
-    "<b>阿里云智能</b>　｜　AI 系统工程师　　"
-    "<font color='#6a6a6a'>2023.07 – 至今</font>",
-    s_role))
-story.append(Paragraph(
-    "实时 AI 决策系统研发与推理链路优化，聚焦低延迟、高可靠性与复杂任务自动化执行。",
-    s_role_intro))
-story.append(Spacer(1, 1))
+    "<b>阿里云智能</b>　·　后端 / Agent 开发工程师　　"
+    "<font color='#6a6a6a'>2023.07 – 至今，2024.10 起转 Agent 方向</font>",
+    s_body,
+))
 
-work_bullets = [
-    "主导实时决策链路优化，构建 <b>ASR → LLM → TTS</b> 全流式架构，"
-    "端到端延迟从 <b>3s+ 降低至 1.5～1.8s</b>",
-    "构建可配置 Agent 平台，实现 Prompt、知识库、工具集与执行策略的动态组合",
-    "引入 Function Calling 与知识检索机制，实现复杂业务流程的自动化执行",
-    "支撑 <b>日均 10 万+ 任务调用</b>，稳定运行于高并发生产环境",
-]
-for b in work_bullets:
-    story.append(Paragraph(f"·　{b}", s_bullet))
+# ─────────────────────────────────────────────────────────────────────
+# AGENT PROJECTS
+# ─────────────────────────────────────────────────────────────────────
+story += section_header("Agent 项目")
 
-# ── CORE PROJECT — UTEKI ───────────────────────────────────────────────
-story += section_header("核心项目")
+# ── Project 1: Voice Agent
+story.append(Paragraph("营销语音 Agent · 阿里云智能营销数字人", s_proj_head))
 story.append(Paragraph(
-    "<b>Uteki</b>　｜　AI 投资研究与决策系统　　"
-    "<font color='#6a6a6a'>个人项目　·　2024.04 – 至今　·　Python · FastAPI · PostgreSQL</font>",
-    s_role))
-story.append(Spacer(1, 2))
+    "项目链接：<font color='#6b3a2e'>aliyun.com/product/thirdsw/aiemployee</font>",
+    s_proj_meta,
+))
+story.append(Paragraph(
+    "面向企业自动化外呼、销售转化和 7×24 客户交互场景，构建高并发下的低延迟实时语音 Agent。"
+    "作为后端核心开发，主导智能外呼系统链路构建与迭代，"
+    "重点解决实时语音对话中的<b>低延迟、可打断、多轮一致性和策略平台化</b>问题。",
+    s_proj_desc,
+))
 
-# Block 1
-story.append(Paragraph("▸ 投资决策流程建模", s_subhead))
-story.append(Paragraph(
-    "将 Fisher、Buffett、Munger 等经典价值投资框架转化为可执行的智能决策流程：",
-    s_body))
-story.append(Paragraph(
-    "<font color='#6b3a2e'><b>业务分析 → 护城河分析 → 管理层评估 → 风险验证 → 估值分析 → 综合决策</b></font>",
-    s_body))
-story.append(Paragraph(
-    "实现投资研究流程的标准化、结构化与可复用。",
-    s_body))
+story.append(Paragraph("Agent 推理链路与延迟优化", s_subhead))
+story.append(bullet("设计端到端流式链路：<b>ASR → LLM 决策（tool calling + RAG）→ TTS</b>，降低等待时间和首包延迟"))
+story.append(bullet("结合 vLLM 推理加速与 LLM Cache，<b>端到端对话延迟从 3s+ → 1.5–1.8s</b>"))
+story.append(bullet("通过双 VAD、双路 ASR 和降噪模型（Omni3），系统性优化打断、抢话、专有词识别和环境噪声场景"))
 
-# Block 2
-story.append(Paragraph("▸ 决策可靠性与偏差控制", s_subhead))
-story.append(Paragraph(
-    "设计 SourceCatalog 与 DataPoint 数据模型，建立统一事实层与引用体系：",
-    s_body))
-story.append(Paragraph(
-    "·　引入 <b>as_of 时间约束机制</b>，严格消除 Lookahead Bias",
-    s_bullet))
-story.append(Paragraph(
-    "·　输出结果强制引用数据来源并进行自动校验",
-    s_bullet))
-story.append(Paragraph(
-    "·　完整保存 Execution Trace，实现决策过程回放与审计",
-    s_bullet))
-story.append(Paragraph(
-    "&ldquo;如何相信模型的决策过程，而不仅仅是相信模型输出。&rdquo;",
-    s_quote))
+story.append(Paragraph("Agent 平台化与策略迭代", s_subhead))
+story.append(bullet("将单一外呼流程升级为<b>可配置 Agent 平台</b>，按业务目标组合系统 Prompt、知识库、工具集和执行策略"))
+story.append(bullet("建设在线调试、版本管理和 A/B 灰度能力，<b>对话策略迭代周期从天级 → 小时级</b>"))
+story.append(bullet("基于函数调用和 RAG 构建对话策略体系，支持上传语料后自动生成 QA 对并接入业务流程"))
 
-# Block 3
-story.append(Paragraph("▸ 决策一致性评估", s_subhead))
 story.append(Paragraph(
-    "构建 <b>Consistency Runner</b>：同一输入重复运行 N 次，量化模型决策一致率，"
-    "衡量随机性对投资结论的影响。",
-    s_body))
+    "<b>业务规模：</b>日均 <b>10 万+ 外呼</b>，峰值 <b>200 QPM</b>（约每小时 1 万通），稳定支撑 <b>200+ 并发</b>",
+    s_body,
+))
+
+# ── Project 2: Uteki
+story.append(Paragraph("投研 Agent · Uteki（雨滴）", s_proj_head))
 story.append(Paragraph(
-    "设计多模型交叉评审机制 <b>Decide → Vote → Tally</b>，"
-    "通过独立分析与匿名评审提高结论稳定性。",
-    s_body))
-
-# Block 4
-story.append(Paragraph("▸ 系统重构与架构演进", s_subhead))
-
-iter_table = Table(
-    [
-        ["", "周期", "Commits", "代码行数"],
-        ["Uteki v1", "21 个月", "1,358", "22.7 万"],
-        ["Uteki v2", "4 个月", "252", "4.4 万"],
-    ],
-    colWidths=[2.4*cm, 2.0*cm, 2.0*cm, 2.4*cm],
-    hAlign="LEFT",
-)
-iter_table.setStyle(TableStyle([
-    ("FONT", (0, 0), (-1, -1), "Hira", 8.5),
-    ("FONT", (0, 1), (0, -1), "HiraBold", 8.5),
-    ("FONT", (0, 0), (-1, 0), "HiraBold", 8),
-    ("TEXTCOLOR", (0, 0), (-1, 0), MUTED),
-    ("TEXTCOLOR", (0, 1), (-1, -1), INK),
-    ("LINEBELOW", (0, 0), (-1, 0), 0.3, FAINT),
-    ("LEFTPADDING", (0, 0), (-1, -1), 0),
-    ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-    ("TOPPADDING", (0, 0), (-1, -1), 2),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
-]))
-story.append(iter_table)
-story.append(Spacer(1, 2))
+    "项目链接：<font color='#6b3a2e'>v1 / v2 / v3 @ github.com/Rain1601</font>",
+    s_proj_meta,
+))
 story.append(Paragraph(
-    "基于实际运行问题完成系统重构：<b>代码规模收敛约 5 倍</b>，消除缓存污染，"
-    "重构上下文管理机制，显著提升系统可维护性与扩展性。",
-    s_body))
+    "面向<b>标普 500 / Nasdaq 100</b> 中&ldquo;清晰可见&rdquo;的高质量公司，"
+    "构建<b>可审计、可回放、可评估</b>的投研 Agent。",
+    s_proj_desc,
+))
 
-# ── TECH ABILITY ───────────────────────────────────────────────────────
-story += section_header("技术能力")
+story.append(Paragraph("核心设计原则", s_subhead))
+story.append(bullet(
+    "<b>证据先于结论</b>　Agent 不直接生成投资判断，而是先构建 SourceCatalog，"
+    "将财报、市场数据、新闻和搜索结果统一为带来源、时间、置信度的 DataPoint"
+))
+story.append(bullet(
+    "<b>分阶段推理</b>　将公司研究拆解为 7-Gate 决策链："
+    "<font color='#6b3a2e'><b>业务质量 → Fisher 增长 → Buffett 护城河 → Munger 管理层 → 反向测试 → 估值 → 综合裁决</b></font>"
+))
+story.append(bullet(
+    "<b>受约束的自主性</b>　每个 Gate 可调用工具，但输出必须包含结构化结论、置信度和 <b>[src:N]</b> 引用；"
+    "parser 校验引用合法性，避免无来源推理"
+))
+story.append(bullet(
+    "<b>时间一致性</b>　引入 <b>as_of</b> 时间窗约束数据和来源时间，"
+    "支持历史回测，<b>严格避免 lookahead bias</b>"
+))
+story.append(bullet(
+    "<b>可观察与可评估</b>　持久化 execution trace、gate output、tool calls 和 citation，"
+    "支持 replay 审计；通过 <b>ConsistencyRunner</b> 和 <b>Arena</b> 评估多次运行稳定性"
+))
 
-skills_data = [
-    [
-        Paragraph("<b>AI 决策系统</b>", s_body),
-        Paragraph("Decision Systems · Agent Architecture · Evaluation Framework · "
-                  "Reliability · Explainability · Bias Control", s_body),
-    ],
-    [
-        Paragraph("<b>Agent 能力</b>", s_body),
-        Paragraph("Planning · Tool Calling · Memory · Reflection · "
-                  "Workflow Orchestration · RAG", s_body),
-    ],
-    [
-        Paragraph("<b>工程能力</b>", s_body),
-        Paragraph("Python · FastAPI · PostgreSQL · SQLite · Docker", s_body),
-    ],
-    [
-        Paragraph("<b>LLM 生态</b>", s_body),
-        Paragraph("OpenAI · Anthropic · Gemini · DeepSeek", s_body),
-    ],
-]
-skills_table = Table(skills_data, colWidths=[3.0*cm, 14.0*cm], hAlign="LEFT")
-skills_table.setStyle(TableStyle([
-    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("LEFTPADDING", (0, 0), (-1, -1), 0),
-    ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-    ("TOPPADDING", (0, 0), (-1, -1), 1.5),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5),
-]))
-story.append(skills_table)
+story.append(Paragraph("工程实现", s_subhead))
+story.append(bullet("FastAPI + React 构建完整 Agent 工作台，支持 SSE 流式执行、运行记录、断线恢复、结果回放"))
+story.append(bullet("Pydantic 约束每个 Gate 的结构化输出，降低自由文本不可控问题"))
+story.append(bullet("Reflection Checkpoint 检测跨 Gate 矛盾，并将上游结论作为下游推理上下文"))
+story.append(bullet("Arena 3-phase（<b>Decide → Vote → Tally</b>），多 LLM 独立判断 + 匿名互评，提高结论稳定性"))
 
-# ── PHILOSOPHY ─────────────────────────────────────────────────────────
-story += section_header("个人项目理念")
+# ── Project 3: Shinkai
+story.append(Paragraph("投研 Agent · Shinkai（深海 · 进行中）", s_proj_head))
 story.append(Paragraph(
-    "&ldquo;我的兴趣不在于构建一个会回答问题的大模型应用，"
-    "而在于构建一个能够持续产生<b>高质量决策</b>的系统。&rdquo;",
-    s_quote))
-story.append(Spacer(1, 1))
+    "项目链接：<font color='#6b3a2e'>github.com/Rain1601/shinkai</font>",
+    s_proj_meta,
+))
 story.append(Paragraph(
-    "&ldquo;Uteki 的核心目标不是替代投资者，而是将优秀投资者的<b>思考过程</b>"
-    "结构化、标准化，并通过工程手段不断验证与改进决策质量。&rdquo;",
-    s_quote))
+    "面向&ldquo;市场尚未充分覆盖&rdquo;的潜在优质公司，"
+    "探索从<b>公司发现 → 初筛 → 假设生成 → 深度研究</b>的主动式投研 Agent。",
+    s_proj_desc,
+))
+story.append(bullet(
+    "<b>与 Uteki 的差异</b>　Uteki 偏深度审计已知公司，Shinkai 偏<b>主动发现未知机会</b> —— "
+    "构成 Research → Discovery 完整闭环"
+))
+story.append(bullet(
+    "<b>候选池发现流程</b>　从财务质量、增长异常、估值错配、行业变化和市场忽视信号中生成研究对象"
+))
+story.append(bullet(
+    "<b>Hypothesis-first 研究链路</b>　先生成投资假设，再反向搜索证据验证或证伪，避免只做信息汇总"
+))
+story.append(bullet(
+    "目标形成 <b>发现 → 假设 → 证据 → 反证 → 深度研究</b> 端到端投研 Agent 流程"
+))
 
+# ─────────────────────────────────────────────────────────────────────
+# BACKEND PROJECTS
+# ─────────────────────────────────────────────────────────────────────
+story += section_header("后端项目")
+story.append(Paragraph("云栖大会核心系统 · 阿里云智能", s_proj_head))
+story.append(bullet("主导核心运营后台、票证、展商、云上峰会等多模块开发与稳定性建设"))
+story.append(bullet("2024 / 2025 年云栖大会<b>应用开发与技术 PM</b>，协调多团队推进需求交付与变更管理"))
+story.append(bullet("支撑累计 <b>8.7 万+ 用户报名</b>与参会，峰值 200 QPM，<b>系统可用性 99.9%</b>"))
+story.append(bullet("主导内容审核系统智能化升级，处理 <b>800 万文件</b>，自动化覆盖 95%，<b>审核人效 +70%</b>"))
 
-# Build
+# ─────────────────────────────────────────────────────────────────────
+# LONG-TERM DIRECTION
+# ─────────────────────────────────────────────────────────────────────
+story += section_header("长期方向")
+story.append(Paragraph(
+    "&ldquo;我致力于长期探索应用 Agent 解决现实世界的复杂问题，"
+    "将<b>优秀决策认知与经验</b>转化为可持续演化的系统。"
+    "在未来，长期聚焦于 AI 与投资研究的结合，"
+    "将优秀投资的思考框架<b>结构化、工程化</b>，"
+    "并通过 Agent 持续验证、优化与迭代决策质量。&rdquo;",
+    s_quote,
+))
+
+# ── Build ─────────────────────────────────────────────────────────────
 doc.build(story)
 print(f"OK -> {out_path}")
