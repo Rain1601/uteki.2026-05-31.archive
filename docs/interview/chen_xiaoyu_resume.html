@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>陈小宇 · 简历</title>
+<style>
+  /* ─── Page setup ───────────────────────────────────────────────────── */
+  @page {
+    size: A4;
+    margin: 8mm 11mm;
+  }
+
+  /* ─── Embed system CJK fonts so Chrome includes them in the PDF ─── */
+  @font-face {
+    font-family: "CN Sans";
+    font-weight: 300 500;
+    src: url("file:///System/Library/Fonts/STHeiti Light.ttc") format("truetype-collection");
+  }
+  @font-face {
+    font-family: "CN Sans";
+    font-weight: 600 900;
+    src: url("file:///System/Library/Fonts/STHeiti Medium.ttc") format("truetype-collection");
+  }
+  @font-face {
+    font-family: "CN Serif";
+    src: url("file:///System/Library/Fonts/Supplemental/Songti.ttc") format("truetype-collection");
+  }
+
+  /* ─── Reset ────────────────────────────────────────────────────────── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── Base typography ──────────────────────────────────────────────── */
+  :root {
+    --ink:    #1a1a1a;
+    --subink: #2e2e2e;
+    --muted:  #6a6a6a;
+    --faint:  #c8c2b6;
+    --accent: #6b3a2e;    /* warm dark editorial accent */
+    --paper:  #ffffff;
+  }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "CN Sans", "PingFang SC", "Hiragino Sans GB", "STHeiti",
+                 "Helvetica Neue", -apple-system, "Segoe UI", sans-serif;
+    font-size: 8.3pt;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum";
+  }
+  body { padding: 0; }
+
+  strong, b { font-weight: 600; color: var(--ink); }
+  a { color: var(--accent); text-decoration: none; }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.92em;
+    color: var(--accent);
+    background: rgba(107, 58, 46, 0.06);
+    padding: 0.5px 4px;
+    border-radius: 2px;
+  }
+
+  /* ─── Header ───────────────────────────────────────────────────────── */
+  .name {
+    font-size: 21pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    line-height: 1.05;
+    margin-bottom: 2pt;
+  }
+  .contact {
+    color: var(--muted);
+    font-size: 8.5pt;
+    margin-bottom: 1pt;
+  }
+  .contact a { color: var(--muted); }
+  .contact .sep { padding: 0 4px; color: var(--faint); }
+  .github-handle a { color: var(--accent); font-weight: 500; }
+  .role-title {
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-top: 4pt;
+    margin-bottom: 2pt;
+  }
+  .intro {
+    color: var(--subink);
+    text-align: justify;
+    font-size: 8.2pt;
+    line-height: 1.5;
+  }
+  .intro p { margin-bottom: 1pt; }
+
+  /* ─── Section dividers ─────────────────────────────────────────────── */
+  .section {
+    margin-top: 3pt;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.5pt;
+  }
+  .section-head .label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .section-head .rule {
+    flex: 1;
+    height: 0.5pt;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+
+  /* ─── Education + work (single-line cards) ─────────────────────────── */
+  .one-line {
+    font-size: 9.2pt;
+    color: var(--ink);
+  }
+  .one-line .meta { color: var(--muted); }
+
+  /* ─── Project blocks ───────────────────────────────────────────────── */
+  .project {
+    margin-top: 2pt;
+  }
+  .project + .project { margin-top: 3pt; }
+  .project-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0.5pt;
+  }
+  .project-name {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+  .project-meta {
+    font-size: 8pt;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .project-link {
+    font-size: 8pt;
+    color: var(--muted);
+    margin-bottom: 1.5pt;
+  }
+  .project-link a { color: var(--accent); }
+  .project-tagline {
+    color: var(--subink);
+    text-align: justify;
+    margin-bottom: 2pt;
+    font-size: 8.2pt;
+    line-height: 1.45;
+  }
+
+  /* ─── Sub-section header inside a project ──────────────────────────── */
+  .subhead {
+    font-size: 8.9pt;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 2pt;
+    margin-bottom: 1pt;
+  }
+
+  /* ─── Bullet lists ─────────────────────────────────────────────────── */
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul li {
+    position: relative;
+    padding-left: 11pt;
+    margin-bottom: 0.5pt;
+    color: var(--ink);
+    font-size: 8.2pt;
+    line-height: 1.38;
+  }
+  ul li::before {
+    content: "·";
+    position: absolute;
+    left: 2pt;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ─── Highlight chain for 7-Gate ───────────────────────────────────── */
+  .chain {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ─── Stat callout (业务规模) ──────────────────────────────────────── */
+  .stat-callout {
+    background: rgba(107, 58, 46, 0.05);
+    border-left: 2pt solid var(--accent);
+    padding: 3pt 8pt;
+    margin-top: 3pt;
+    font-size: 8.2pt;
+    color: var(--ink);
+  }
+
+  /* ─── Long-term direction (Songti quote) ───────────────────────────── */
+  .long-term {
+    margin-top: 2pt;
+    padding: 4pt 9pt;
+    border-left: 2pt solid var(--accent);
+    background: rgba(107, 58, 46, 0.03);
+    font-family: "CN Serif", "Songti SC", "STSong", Georgia, serif;
+    color: var(--subink);
+    font-size: 8.3pt;
+    line-height: 1.45;
+  }
+  .long-term p + p { margin-top: 1.5pt; }
+
+  /* ─── Disable orphans ──────────────────────────────────────────────── */
+  h2, h3, .project-head { break-after: avoid; page-break-after: avoid; }
+  .project, ul { break-inside: avoid; page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ────────────────────────────────────────────────────────── -->
+<div class="name">陈小宇</div>
+<div class="contact">
+  186-0292-0361
+  <span class="sep">｜</span>
+  <a href="mailto:rain1104@foxmail.com">rain1104@foxmail.com</a>
+  <span class="sep">｜</span>
+  杭州
+  <span class="sep">｜</span>
+  <span class="github-handle"><a href="https://github.com/Rain1601">github.com/Rain1601</a></span>
+</div>
+
+<div class="role-title">Agent 开发工程师 ｜ 通用 Agent 系统 ｜ 投研 Agent</div>
+
+<div class="intro">
+  <p>后端 / Agent 工程师，关注<b>可运行、可观察、可评估、可迭代</b>的 Agent 系统。</p>
+  <p>在阿里云参与并主导实时语音 Agent 核心链路建设，支撑高并发生产环境，
+     将<b>端到端对话延迟从 3s+ 优化至 1.5–1.8s</b>。</p>
+  <p>独立设计并实现投研 Agent <b>Uteki</b>，围绕<b>证据约束、时间一致性、结构化推理、execution trace 和多模型评估</b>，
+     探索 Agent 在复杂投研决策中的工程化落地。</p>
+</div>
+
+<!-- ─── EDUCATION ─────────────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">教育经历</span><span class="rule"></span></div>
+  <div class="one-line">
+    <b>西安交通大学</b>　·　软件工程
+    <span class="meta">硕士 2020.09 – 2023.07（电信学部）　·　学士 2016.09 – 2020.06（软件学院）</span>
+  </div>
+</div>
+
+<!-- ─── WORK EXPERIENCE ───────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">工作经历</span><span class="rule"></span></div>
+  <div class="one-line">
+    <b>阿里云智能</b>　·　后端 / Agent 开发工程师
+    <span class="meta">2023.07 – 至今，2024.10 起转 Agent 方向</span>
+  </div>
+</div>
+
+<!-- ─── AGENT PROJECTS ────────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">Agent 项目</span><span class="rule"></span></div>
+
+  <!-- ── Project: Voice Agent ─────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">营销语音 Agent · 阿里云智能营销数字人</span>
+    </div>
+    <div class="project-link">
+      项目链接：<a href="https://www.aliyun.com/product/thirdsw/aiemployee">aliyun.com/product/thirdsw/aiemployee</a>
+    </div>
+    <div class="project-tagline">
+      面向企业自动化外呼、销售转化和 7×24 客户交互场景，构建高并发下的低延迟实时语音 Agent。
+      作为后端核心开发，主导智能外呼系统链路构建与迭代，重点解决实时语音对话中的<b>低延迟、可打断、多轮一致性和策略平台化</b>问题。
+    </div>
+
+    <div class="subhead">Agent 推理链路与延迟优化</div>
+    <ul>
+      <li>设计端到端流式链路：<b>ASR → LLM 决策（tool calling + RAG）→ TTS</b>，降低等待时间和首包延迟</li>
+      <li>结合 vLLM 推理加速与 LLM Cache，<b>端到端对话延迟从 3s+ → 1.5–1.8s</b></li>
+      <li>通过双 VAD、双路 ASR 和降噪模型（Omni3），系统性优化打断、抢话、专有词识别和环境噪声场景</li>
+    </ul>
+
+    <div class="subhead">Agent 平台化与策略迭代</div>
+    <ul>
+      <li>将单一外呼流程升级为<b>可配置 Agent 平台</b>，按业务目标组合系统 Prompt、知识库、工具集和执行策略</li>
+      <li>建设在线调试、版本管理和 A/B 灰度能力，<b>对话策略迭代周期从天级 → 小时级</b></li>
+      <li>基于函数调用和 RAG 构建对话策略体系，支持上传语料后自动生成 QA 对并接入业务流程</li>
+    </ul>
+
+    <div class="stat-callout">
+      <b>业务规模：</b>日均 <b>10 万+ 外呼</b>，峰值 <b>200 QPM</b>（约每小时 1 万通），稳定支撑 <b>200+ 并发</b>
+    </div>
+  </div>
+
+  <!-- ── Project: Uteki ───────────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">投研 Agent · Uteki（雨滴）</span>
+    </div>
+    <div class="project-link">
+      项目链接：
+      <a href="https://github.com/Rain1601/uteki.v1.archive">v1</a> ｜
+      <a href="https://github.com/Rain1601/uteki.v2">v2</a> ｜
+      <a href="https://github.com/Rain1601/uteki">v3</a>
+    </div>
+    <div class="project-tagline">
+      面向 <b>标普 500 / Nasdaq 100</b> 中“清晰可见”的高质量公司，构建<b>可审计、可回放、可评估</b>的投研 Agent。
+    </div>
+
+    <div class="subhead">核心设计原则</div>
+    <ul>
+      <li><b>证据先于结论</b>：Agent 不直接生成投资判断，而是先构建 SourceCatalog，将财报、市场数据、新闻和搜索结果统一为带来源、时间、置信度的 DataPoint</li>
+      <li><b>分阶段推理</b>：将公司研究拆解为 7-Gate 决策链 —— <span class="chain">业务质量 → Fisher 增长 → Buffett 护城河 → Munger 管理层 → 反向测试 → 估值 → 综合裁决</span></li>
+      <li><b>受约束的自主性</b>：每个 Gate 可调用工具，但输出必须包含结构化结论、置信度和 <code>[src:N]</code> 引用；parser 校验引用合法性，避免无来源推理</li>
+      <li><b>时间一致性</b>：引入 <code>as_of</code> 时间窗约束数据和来源时间，支持历史回测，<b>严格避免 lookahead bias</b></li>
+      <li><b>可观察与可评估</b>：持久化 execution trace、gate output、tool calls 和 citation，支持 replay 审计；通过 <b>ConsistencyRunner</b> 和 <b>Arena</b> 评估多次运行稳定性</li>
+    </ul>
+
+    <div class="subhead">工程实现</div>
+    <ul>
+      <li>FastAPI + React 构建完整 Agent 工作台，支持 SSE 流式执行、运行记录、断线恢复、结果回放</li>
+      <li>Pydantic 约束每个 Gate 的结构化输出，降低自由文本不可控问题</li>
+      <li>Reflection Checkpoint 检测跨 Gate 矛盾，并将上游结论作为下游推理上下文</li>
+      <li>Arena 3-phase（<b>Decide → Vote → Tally</b>），多 LLM 独立判断 + 匿名互评，提高结论稳定性</li>
+    </ul>
+  </div>
+
+  <!-- ── Project: Shinkai ─────────────────────────────────────────── -->
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">投研 Agent · Shinkai（深海 · 进行中）</span>
+    </div>
+    <div class="project-link">
+      项目链接：<a href="https://github.com/Rain1601/shinkai">github.com/Rain1601/shinkai</a>
+    </div>
+    <div class="project-tagline">
+      面向“市场尚未充分覆盖”的潜在优质公司，探索从 <b>公司发现 → 初筛 → 假设生成 → 深度研究</b> 的主动式投研 Agent。
+    </div>
+    <ul>
+      <li><b>与 Uteki 的差异</b>：Uteki 偏深度审计已知公司，Shinkai 偏<b>主动发现未知机会</b> —— 共同构成 Research → Discovery 完整闭环</li>
+      <li><b>候选池发现流程</b>：从财务质量、增长异常、估值错配、行业变化和市场忽视信号中生成研究对象</li>
+      <li><b>Hypothesis-first 研究链路</b>：先生成投资假设，再反向搜索证据验证或证伪，避免只做信息汇总</li>
+      <li>目标形成 <span class="chain">发现 → 假设 → 证据 → 反证 → 深度研究</span> 端到端投研 Agent 流程</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── BACKEND PROJECT ───────────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">后端项目</span><span class="rule"></span></div>
+  <div class="project">
+    <div class="project-head">
+      <span class="project-name">云栖大会核心系统 · 阿里云智能</span>
+    </div>
+    <ul>
+      <li>主导核心运营后台、票证、展商、云上峰会等多模块开发与稳定性建设</li>
+      <li>2024 / 2025 年云栖大会<b>应用开发与技术 PM</b>，协调多团队推进需求交付与变更管理</li>
+      <li>支撑累计 <b>8.7 万+ 用户报名</b>与参会，峰值 200 QPM，<b>系统可用性 99.9%</b></li>
+      <li>主导内容审核系统智能化升级，处理 <b>800 万文件</b>，自动化覆盖 95%，<b>审核人效 +70%</b></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ─── LONG-TERM DIRECTION ───────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-head"><span class="label">长期方向</span><span class="rule"></span></div>
+  <div class="long-term">
+    <p>我致力于长期探索应用 Agent 解决现实世界的复杂问题，将<b>优秀决策认知与经验</b>转化为可持续演化的系统。</p>
+    <p>在未来，长期聚焦于 AI 与投资研究的结合，将优秀投资的思考框架<b>结构化、工程化</b>，并通过 Agent 持续验证、优化与迭代决策质量。</p>
+  </div>
+</div>
+
+</body>
+</html>
