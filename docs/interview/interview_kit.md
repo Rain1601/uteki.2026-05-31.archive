@@ -19,31 +19,72 @@
 
 ## 1. 简历内容（终稿，直接复制）
 
-### 1.1 项目段落 · 通用基金版（终稿，含 v1→v2 迭代证据）
+### 1.1 项目段落 · 通用基金版（**终稿 · 全声明可核查 · 直接复制**）
 
 ```
-雨滴 · Uteki — 系统化 LLM 投研决策框架（个人项目，v2）
-2026.02 - 2026.05 | 单人主导，4 个月 252 commit / 4.4 万行 | 
-Python · FastAPI · PostgreSQL
+雨滴 · Uteki — 系统化 LLM 投研决策框架（个人项目，跨 v1 + v2 两版迭代）
+2024.04 - 2026.05 | 单人主导 | 美 / 港 / A 股
+Python · FastAPI · async SQLAlchemy · PostgreSQL · 7 家 LLM Provider 统一适配
 
-将 Fisher 15 问 / Buffett 护城河 / Munger 反向测试这套经典价值投资框架，
-编码成可重复、可审计、可量化稳定性的 LLM 决策 pipeline，覆盖美 / 港 / A 股。
+把 Fisher 15 问 / Buffett 护城河 / Munger 反向测试的经典价值投资框架，
+codify 成可重复、可审计、可量化稳定性的 LLM 决策 pipeline ——
+让 LLM 做决策，但每一步可被人审视。
 
-· 7-Gate 投研流水线 — 每 gate 输出结构化 JSON（结论 + 置信度 + 引用源 ID），
-  跨 gate Reflection Checkpoint 自动检测前后矛盾；N=10 次重跑下 action 一致率 XX%
-· 回测可信度工程 — 自建 SourceCatalog + as_of 时间窗约束，所有数据点按
-  published_at 拒绝晚于 as_of 的记录，严格无未来信息泄漏（lookahead bias prevention）
-· Arena 3-phase 多模型评测 — N 个 LLM 独立判断 → 匿名互投 → 计票，量化
-  跨模型决策一致性；ConsistencyRunner 跑 N 次同输入测内在 CV
-· 完整 execution trace 持久化（DecisionHarness + ModelIO 模型），任何决策可
-  逐步 replay 与归因审计
-· 系统迭代证据 — 本系统（v2）是基于前作 v1（21 个月 / 1358 commit / 22.7 万行）
-  4 个月深度踩坑后的重写：代码量收敛 ~5×、增补 SourceCatalog 防 lookahead bias、
-  增补 ConsistencyRunner 量化稳定性、修复 v1 遗留的 symbol-less cache 
-  cross-contamination 问题；详见附件 docs/interview/uteki_v1_to_v2_evolution.md
+· 7-Gate 投研流水线 — 业务 → Fisher → Buffett 护城河 → Munger 管理 →
+  Munger 反向测试 → 估值 → Synthesis。每 gate 输出 Pydantic 结构化 JSON
+  （结论 + 置信度 + 引用源 ID），下游强制基于上游引用推理；跨 gate
+  Reflection Checkpoint 自动检测前后矛盾并注入修正信号
+
+· 回测可信度工程（核心差异化） — 自建 SourceCatalog + DataPoint 模型，
+  每个数据点带 (source / url / published_at)；LLM 输出强制 [src:N] 引用 +
+  parser 校验；as_of 时间窗约束让 catalog 主动拒绝 published_at > as_of
+  的记录。**回测严格无 lookahead bias，所有决策事件流持久化可逐步 replay 审计**
+
+· 量化稳定性 + 多模型 ensemble — ConsistencyRunner 同输入跑 N 次量化
+  action 一致率 / gate score CV；Arena 3-phase（Decide → Vote → Tally）让
+  N 个 LLM 独立判断 + 匿名互投评审，量化跨模型决策一致性；LLM-as-Judge
+  按 rubric 给 gate 输出打分
+
+· v1 → v2 工程迭代证据 — 本系统是 v1（21 个月 / 1358 commit / 22.7 万行）
+  深度踩坑后的重写：v2 用 4 个月 / 252 commit / 4.4 万行做出更完整能力，
+  代码量收敛 ~5×。增补 SourceCatalog 防 lookahead bias、增补 ConsistencyRunner
+  量化稳定性、修复 v1 遗留的 symbol-less cache cross-contamination
+  详见 docs/interview/uteki_v1_to_v2_evolution.md
 ```
 
-**字数控制**：上面正好 ~13 行（加了第 5 个 evolution bullet）。如果简历一栏放不下，删第 3 或第 4 bullet 保留 evolution 那条 —— **v1→v2 迭代证据是最难复制、最有信号的一条**。
+### 1.1.1 这一版相对前一版改了什么（透明声明）
+
+| 改动 | 原因 |
+|---|---|
+| 起始日期 `2026.02` → `2024.04` | 包含 v1 投入时间，呈现 25 个月真实承诺 |
+| 副标题加 "跨 v1 + v2 两版迭代" | header 直接预告 evolution 叙事 |
+| 删 "N=10 次重跑下 action 一致率 XX%" | XX 是 placeholder，**当前无真实数字就别假装有** |
+| 删 "Drift Monitor" 提及 | uteki.open 实际未实现（只在 uteki 仓有） |
+| "DecisionHarness + ModelIO" 段落 → 折进可信度工程 bullet | 减 1 bullet 提高密度（5 bullet → 4 bullet）|
+| 技术栈加 "7 家 LLM Provider 统一适配" | 真实可核查的可量化能力点 |
+| 加 "让 LLM 做决策，但每一步可被人审视" | 一句话凝练价值主张 |
+
+**所有数字与技术声明都已在仓库代码里核对过**（grep `SourceCatalog` / `as_of` / `ConsistencyRunner` / `ArenaVote` / `Reflection Checkpoint` / LLM provider count）。**没有任何 XX 占位或拍脑袋数字**。
+
+### 1.1.2 优化的 3 个判断（对应"有亮点 / 清晰 / 真实"）
+
+**有亮点**（4 个差异化信号）：
+1. **"经典价值投资框架 codify"** —— 同时讲投资 + 工程
+2. **"回测严格无 lookahead bias"** —— 60 秒决定可信度的话题
+3. **"代码量收敛 ~5×"** —— 罕见的"删的勇气"信号
+4. **"跨 v1 + v2 两版迭代"** —— Pain + Reflection = Progress
+
+**清晰**（4 个原则）：
+- 每 bullet 一个概念 + 一句证据
+- 技术名词只用名词（FastAPI / async SQLAlchemy）不用 buzzword（Multi-Agent / Framework）
+- 中文衔接英文专有名词，无生硬翻译
+- 4 bullet × 3-4 行 = 不会让面试官跳过
+
+**真实**（4 条原则）：
+- 全数字（21 月 / 1358 / 22.7 万 / 4 月 / 252 / 4.4 万 / ~5×）实测核对
+- 不写未达成的（如回测 alpha、ConsistencyRunner CV 具体结果）
+- 不写不存在的（Drift Monitor 删了）
+- "美 / 港 / A 股" 基于代码层（yfinance + tushare）可支持，**Rain 需确认是否真跑过港股完整 7-Gate**
 
 ### 1.2 投递时的微调清单
 
