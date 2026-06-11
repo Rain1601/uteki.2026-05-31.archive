@@ -8,7 +8,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # 检查是否在项目根目录
-if [ ! -f "LOCAL_DEVELOPMENT.md" ]; then
+if [ ! -f "docs/LOCAL_DEVELOPMENT.md" ]; then
     echo "❌ 错误: 请在项目根目录运行此脚本"
     exit 1
 fi
